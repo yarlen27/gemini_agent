@@ -77,7 +77,7 @@ while True:
             # Commit changes and create PR
             try:
                 subprocess.run("git add .", shell=True, check=True)
-                subprocess.run(f"git commit -m \"feat: Resolves #{ISSUE_NUMBER} - {ISSUE_TITLE}\", shell=True, check=True)
+                subprocess.run(["git", "commit", "-m", f"feat: Resolves #{ISSUE_NUMBER} - {ISSUE_TITLE}"], check=True)
                 subprocess.run(f"git push origin {BRANCH_NAME}", shell=True, check=True)
                 
                 pr_title = f"feat(issue-{ISSUE_NUMBER}): {ISSUE_TITLE}"
