@@ -107,7 +107,7 @@ while True:
             request_body["tool_response"] = tool_result
             continue # Continue the loop to send the tool_response
         elif action == "write_file":
-            print(f"Agent requested to write file: {agent_response["file_path"]}")
+            print(f"Agent requested to write file: {agent_response['file_path']}")
             file_path = agent_response["file_path"]
             content = agent_response["content"]
             try:
