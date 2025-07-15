@@ -7,16 +7,20 @@ services:
     ports:
       - "8001:8000"
     volumes:
-      # Mount the app directory for live reloading during development
       - ./server/app:/app/app
-    env_file:
-      - ./server/.env
-    depends_on:
-      - redis
     environment:
       - REDIS_URL=redis://redis:6379
+      - GEMINI_API_KEY=AIzaSyDVkgRk8wG9dU5k9h4AIfFkitAkrYTfFz8
+    depends_on:
+      redis:
+        condition: service_healthy
 
   redis:
     image: "redis:7-alpine"
     ports:
       - "6380:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 1s
+      timeout: 3s
+      retries: 5
