@@ -94,7 +94,7 @@ while True:
             request_body["tool_response"] = tool_result
             continue # Continue the loop to send the tool_response
         elif action == "read_file":
-            print(f"Agent requested to read file: {agent_response["file_path"]}")
+            print(f"Agent requested to read file: {agent_response['file_path']}")
             file_path = agent_response["file_path"]
             try:
                 with open(file_path, 'r') as f:
