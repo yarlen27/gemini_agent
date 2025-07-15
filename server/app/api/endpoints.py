@@ -3,6 +3,7 @@ from ..core.models import AgentRequest, AgentResponse
 from ..services.redis_service import redis_service
 from ..services.gemini_service import gemini_service
 import uuid
+import json
 
 router = APIRouter()
 
