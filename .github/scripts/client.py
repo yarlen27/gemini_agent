@@ -73,7 +73,7 @@ while True:
 
         action = agent_response["action"]
         if action == "finish":
-            print(f"Agent finished with message: {agent_response.get("message", "No message")}")
+            print(f"Agent finished with message: {agent_response.get('message', 'No message')}")
             # Commit changes and create PR
             try:
                 subprocess.run("git add .", shell=True, check=True)
