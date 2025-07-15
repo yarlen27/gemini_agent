@@ -42,7 +42,7 @@ jobs:
           # If it's a comment, use the comment body as the main prompt
           PROMPT_BODY: ${{ github.event.comment.body || github.event.issue.body }}
           # Our API server URL
-          GEMINI_AGENT_API_URL: "http://localhost:8000" # This will be replaced with the deployed URL
+          GEMINI_AGENT_API_URL: "https://gemini-agent-api-723511405151.us-central1.run.app"
         run: python .github/scripts/client.py
 
       - name: Create Pull Request
