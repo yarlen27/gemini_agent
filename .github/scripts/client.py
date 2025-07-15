@@ -72,6 +72,7 @@ while True:
         conversation_id = agent_response["conversation_id"]
 
         action = agent_response["action"]
+        print(f"Agent Action: {action}")
         if action == "finish":
             print(f"Agent finished with message: {agent_response.get('message', 'No message')}")
             # Commit changes and create PR
