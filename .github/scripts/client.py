@@ -17,6 +17,16 @@ print(f"Issue Body: {ISSUE_BODY}")
 print(f"Prompt Body: {PROMPT_BODY}")
 print(f"API URL: {GEMINI_AGENT_API_URL}")
 
+# Create a new branch for the changes
+BRANCH_NAME = f"gemini-issue-{ISSUE_NUMBER}"
+print(f"Creating new branch: {BRANCH_NAME}")
+try:
+    subprocess.run(f"git checkout -b {BRANCH_NAME}", shell=True, check=True)
+    subprocess.run(f"git push origin {BRANCH_NAME}", shell=True, check=True) # Push empty branch
+except subprocess.CalledProcessError as e:
+    print(f"Error creating branch: {e.stderr}")
+    exit(1)
+
 conversation_id = None
 
 def run_shell_command(command: str):
