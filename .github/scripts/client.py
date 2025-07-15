@@ -86,6 +86,8 @@ while True:
                 print(f"PR Body: {pr_body}")
                 print(f"Creating Pull Request with title: {pr_title}")
                 print(f"PR Body: {pr_body}")
+                print(f"Creating Pull Request with title: {pr_title}")
+                print(f"PR Body: {pr_body}")
                 subprocess.run(f"gh pr create --base main --head {BRANCH_NAME} --title \"{pr_title}\" --body \"{pr_body}\"", shell=True, check=True)
                 print(f"Pull Request created for branch {BRANCH_NAME}")
             except subprocess.CalledProcessError as e:
