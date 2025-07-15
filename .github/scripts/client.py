@@ -85,8 +85,18 @@ while True:
             continue # Continue the loop to send the tool_response
         elif action == "write_file":
             print(f"Agent requested to write file: {agent_response["file_path"]}")
-            # TODO: Implement file writing
-            pass
+            file_path = agent_response["file_path"]
+            content = agent_response["content"]
+            try:
+                # Ensure directory exists
+                os.makedirs(os.path.dirname(file_path), exist_ok=True)
+                with open(file_path, 'w') as f:
+                    f.write(content)
+                tool_result = {"tool_name": "write_file", "file_path": file_path, "stdout": "File written successfully"}
+            except Exception as e:
+                tool_result = {"tool_name": "write_file", "file_path": file_path, "stderr": str(e), "exit_code": 1}
+            request_body["tool_response"] = tool_result
+            continue # Continue the loop to send the tool_response
         else:
             print(f"Unknown action: {action}")
             break
