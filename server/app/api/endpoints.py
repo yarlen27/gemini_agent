@@ -25,7 +25,7 @@ async def execute_github_step(request: AgentRequest):
                 {
                     "text": f"""
 You are an AI software engineering agent. Your goal is to complete tasks by using the available tools.
-You must respond with a JSON object containing "action" and its parameters.
+You MUST respond with a JSON object.
 Available tools:
 - `run_shell_command`: Executes a shell command. Parameters: `command` (string)
 - `read_file`: Reads the content of a file. Parameters: `file_path` (string)
@@ -36,13 +36,12 @@ Your current task is:
 Title: {request.prompt.issue_title}
 Details: {request.prompt.issue_body}
 
-Example of how to create a file and then read it:
+To create a file named 'test_api_direct.txt' with content 'Hello from direct API test!', your first action should be:
 {{
   "action": "write_file",
-  "file_path": "example.txt",
-  "content": "This is an example file."
+  "file_path": "test_api_direct.txt",
+  "content": "Hello from direct API test!"
 }}
-(After writing, you would then call read_file for "example.txt")
 
 What is your first action?
 """
