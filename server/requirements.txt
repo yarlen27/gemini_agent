@@ -2,4 +2,5 @@ fastapi
 uvicorn[standard]
 google-generativeai
 redis
-dotenv
+python-dotenv
+pydantic-settings
