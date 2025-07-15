@@ -19,36 +19,56 @@ async def execute_github_step(request: AgentRequest):
     # Add the current request to the history
     if request.prompt:
         # Initial prompt from GitHub Issue
-        user_message = f"""
+        user_message = {
+            "role": "user",
+            "parts": [
+                {
+                    "text": f"""
 You are an AI software engineering agent. Your goal is to complete tasks by using the available tools.
-You have the following tools:
-- `run_shell_command`: Executes a shell command.
-- `read_file`: Reads the content of a file.
-- `write_file`: Writes content to a file.
+You must respond with a JSON object containing "action" and its parameters.
+Available tools:
+- `run_shell_command`: Executes a shell command. Parameters: `command` (string)
+- `read_file`: Reads the content of a file. Parameters: `file_path` (string)
+- `write_file`: Writes content to a file. Parameters: `file_path` (string), `content` (string)
+- `finish`: Indicates task completion. Parameters: `message` (string)
 
-Your task is: {request.prompt.issue_title}
+Your current task is:
+Title: {request.prompt.issue_title}
 Details: {request.prompt.issue_body}
 
-Respond with a JSON object containing "action" and its parameters.
-Example for shell command: {{"action": "run_shell_command", "command": "ls -la"}}
-Example for writing a file: {{"action": "write_file", "file_path": "path/to/file.txt", "content": "file content"}}
-Example for reading a file: {{"action": "read_file", "file_path": "path/to/file.txt"}}
-Example for finishing: {{"action": "finish", "message": "Task completed successfully."}}
+Example of how to create a file and then read it:
+{{
+  "action": "write_file",
+  "file_path": "example.txt",
+  "content": "This is an example file."
+}}
+(After writing, you would then call read_file for "example.txt")
 
 What is your first action?
 """
-        history.append({"role": "user", "parts": user_message})
+                }
+            ]
+        }
+        history.append(user_message)
     elif request.tool_response:
         # Response from a tool execution
-        tool_output = f"""
-Tool output for {request.tool_response.tool_name} (command: {request.tool_response.command}):
+        tool_output = {
+            "role": "user",
+            "parts": [
+                {
+                    "text": f"""
+Tool output for {request.tool_response.tool_name}:
+Command: {request.tool_response.command}
 Stdout: {request.tool_response.stdout}
 Stderr: {request.tool_response.stderr}
 Exit Code: {request.tool_response.exit_code}
 
 What is your next action?
 """
-        history.append({"role": "user", "parts": tool_output})
+                }
+            ]
+        }
+        history.append(tool_output)
 
     # Get response from Gemini
     gemini_response_text = await gemini_service.generate_response(history)
