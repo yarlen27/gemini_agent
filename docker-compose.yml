@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: ./server
+    ports:
+      - "8001:8000"
+    volumes:
+      # Mount the app directory for live reloading during development
+      - ./server/app:/app/app
+    env_file:
+      - ./server/.env
+    depends_on:
+      - redis
+    environment:
+      - REDIS_URL=redis://redis:6379
+
+  redis:
+    image: "redis:7-alpine"
+    ports:
+      - "6380:6379"
