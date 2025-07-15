@@ -24,26 +24,18 @@ async def execute_github_step(request: AgentRequest):
             "parts": [
                 {
                     "text": f"""
-You are an AI software engineering agent. Your goal is to complete tasks by using the available tools.
-You MUST respond with a JSON object.
-Available tools:
-- `run_shell_command`: Executes a shell command. Parameters: `command` (string)
-- `read_file`: Reads the content of a file. Parameters: `file_path` (string)
-- `write_file`: Writes content to a file. Parameters: `file_path` (string), `content` (string)
-- `finish`: Indicates task completion. Parameters: `message` (string)
+You are an AI software engineering agent.
+Your task is to create a file named 'test_simple.txt' with the content 'This is a simple test.'.
+You MUST respond with a JSON object containing "action" and its parameters.
 
-Your current task is:
-Title: {request.prompt.issue_title}
-Details: {request.prompt.issue_body}
-
-To create a file named 'test_api_direct.txt' with content 'Hello from direct API test!', your first action should be:
+Example of the expected JSON response for this task:
 {{
   "action": "write_file",
-  "file_path": "test_api_direct.txt",
-  "content": "Hello from direct API test!"
+  "file_path": "test_simple.txt",
+  "content": "This is a simple test."
 }}
 
-What is your first action?
+Respond ONLY with the JSON object. Do NOT include any other text or explanation.
 """
                 }
             ]
@@ -56,13 +48,16 @@ What is your first action?
             "parts": [
                 {
                     "text": f"""
-Tool output for {request.tool_response.tool_name}:
+You previously requested to run the tool '{request.tool_response.tool_name}'.
+Here is the output from that tool execution:
+
 Command: {request.tool_response.command}
 Stdout: {request.tool_response.stdout}
 Stderr: {request.tool_response.stderr}
 Exit Code: {request.tool_response.exit_code}
 
-What is your next action?
+Based on this output, what is your next action?
+You MUST respond with a JSON object.
 """
                 }
             ]
