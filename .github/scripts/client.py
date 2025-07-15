@@ -72,8 +72,17 @@ while True:
             continue # Continue the loop to send the tool_response
         elif action == "read_file":
             print(f"Agent requested to read file: {agent_response["file_path"]}")
-            # TODO: Implement file reading
-            pass
+            file_path = agent_response["file_path"]
+            try:
+                with open(file_path, 'r') as f:
+                    content = f.read()
+                tool_result = {"tool_name": "read_file", "file_path": file_path, "content": content}
+            except FileNotFoundError:
+                tool_result = {"tool_name": "read_file", "file_path": file_path, "stderr": "File not found", "exit_code": 1}
+            except Exception as e:
+                tool_result = {"tool_name": "read_file", "file_path": file_path, "stderr": str(e), "exit_code": 1}
+            request_body["tool_response"] = tool_result
+            continue # Continue the loop to send the tool_response
         elif action == "write_file":
             print(f"Agent requested to write file: {agent_response["file_path"]}")
             # TODO: Implement file writing
