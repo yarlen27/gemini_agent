@@ -37,6 +37,16 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
+      - name: Initial Gemini Comment
+        run: |
+          gh issue comment ${{ github.event.issue.number }} --body "🔷 Gemini is working...
+
+          I'll analyze this and get back to you.
+
+          [View job run →](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Run Gemini Agent Client
         id: gemini
         env:
