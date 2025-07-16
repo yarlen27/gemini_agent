@@ -181,6 +181,7 @@ while True:
                         exit(1)
                     break
                 # Continue processing the new response (not finish)
+                continue  # Go back to the main loop to process the new action
             except requests.exceptions.RequestException as e:
                 logger.critical(f"Error sending tool response: {e}")
                 exit(1)
@@ -245,6 +246,7 @@ while True:
                         exit(1)
                     break
                 # Continue processing the new response (not finish)
+                continue  # Go back to the main loop to process the new action
             except requests.exceptions.RequestException as e:
                 logger.critical(f"Error sending tool response: {e}")
                 exit(1)
@@ -316,6 +318,7 @@ while True:
                         exit(1)
                     break
                 # Continue processing the new response (not finish)
+                continue  # Go back to the main loop to process the new action
             except requests.exceptions.RequestException as e:
                 logger.critical(f"Error sending tool response: {e}")
                 exit(1)
