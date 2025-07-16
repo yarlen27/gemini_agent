@@ -41,6 +41,12 @@ cd server && npm test
 cd server && npm run build
 ```
 
+### Automated Production Deployment (Recommended)
+```bash
+# One-command deployment using GitHub Secrets
+./deploy_with_secrets.sh
+```
+
 ### Manual Production Deployment Steps
 1. **Push changes**
    ```bash
@@ -60,11 +66,13 @@ cd server && npm run build
    # First time only: git clone https://github.com/yarlen27/gemini_agent.git .
    ```
 
-4. **Edit docker-compose.production.yml** (replace environment variables)
+4. **Get secrets and replace variables**
    ```bash
    cd server
-   # Change ${GEMINI_API_KEY} to: GEMINI_API_KEY=<YOUR_GEMINI_API_KEY>
-   # Change ${GITHUB_TOKEN} to: GITHUB_TOKEN=<YOUR_GITHUB_TOKEN>
+   GEMINI_KEY=$(gh secret get GEMINI_API_KEY)
+   GITHUB_KEY=$(gh secret get PROD_GITHUB_TOKEN)
+   sed -i "s/\${GEMINI_API_KEY}/GEMINI_API_KEY=$GEMINI_KEY/g" docker-compose.production.yml
+   sed -i "s/\${GITHUB_TOKEN}/GITHUB_TOKEN=$GITHUB_KEY/g" docker-compose.production.yml
    ```
 
 5. **Stop existing containers**
@@ -164,3 +172,13 @@ Required in `docker-compose.yml`:
 - **Deployment directory**: `/opt/gemini_agent_new`
 - **Server IP**: `178.128.133.94`
 - **Other services running**: Vault (port 8200), OCR services (8000, 8081), PostgreSQL (5432)
+
+### 🔐 GitHub Secrets Configuration
+- **GEMINI_API_KEY**: Google Gemini API key (configured via `gh secret set`)
+- **PROD_GITHUB_TOKEN**: GitHub personal access token (configured via `gh secret set`)
+- **Access secrets**: `gh secret get SECRET_NAME`
+- **List secrets**: `gh secret list`
+
+### 📋 Deployment Scripts
+- **deploy_with_secrets.sh**: Automated deployment using GitHub Secrets
+- **Requirements**: `gh` CLI tool authenticated on local machine
