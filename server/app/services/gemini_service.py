@@ -57,7 +57,14 @@ class GeminiService:
         ]
 
     async def generate_response(self, history: list) -> str:
-        response = await self.model.generate_content_async(history, tools=self.tools)
+        try:
+            response = await self.model.generate_content_async(history, tools=self.tools)
+        except Exception as e:
+            # Fallback without tools if there's an error
+            print(f"Error with tools: {e}")
+            response = await self.model.generate_content_async(history)
+            # Return a default action if no tools available
+            return '{"action": "finish", "message": "Error with function calling. Please try again."}'
         # Parse the functionCall from the response
         if response.candidates and response.candidates[0].content.parts[0].function_call:
             function_call = response.candidates[0].content.parts[0].function_call
