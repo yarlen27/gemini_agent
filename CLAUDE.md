@@ -17,12 +17,6 @@ This is a **Gemini Agent for GitHub Automation** - an AI-powered agent that auto
 - **Production URL**: https://gemini.27cobalto.com
 - **Health Check**: https://gemini.27cobalto.com/health
 
-### Legacy (Python - DEPRECATED)
-- **API Server**: FastAPI application (`server/app/main.py`) - NO LONGER USED
-- **State Management**: Redis for conversation history persistence
-- **AI Integration**: Google Gemini (gemini-2.5-flash) with function calling capabilities
-- **GitHub Integration**: Custom client script (`/.github/scripts/client.py`) that communicates with the API
-
 ## Development Commands
 
 ### Local Development
@@ -109,13 +103,10 @@ cd server-ts && npm run build
 - **GitHubService** (`server-ts/src/services/GitHubService.ts`): Manages GitHub API interactions
 - **WebhookController** (`server-ts/src/controllers/WebhookController.ts`): Handles GitHub webhook events
 
-### Services (Python - Legacy)
-- **GeminiService** (`server/app/services/gemini_service.py`): Handles AI interactions with function calling for file operations
-- **RedisService** (`server/app/services/redis_service.py`): Manages conversation state persistence
 
 ### GitHub Workflows
 - `.github/workflows/gemini.yml` - Triggers on issues containing "@gemini"
-- `.github/scripts/client.py` - Client that sends requests to the API server
+- `.github/scripts/client.ts` - TypeScript client that sends requests to the API server
 
 ## Development Guidelines
 
@@ -125,20 +116,14 @@ cd server-ts && npm run build
 3. Create PRs to main branch
 
 ### Code Standards
-- All Python functions must have type hints
-- Use Pydantic models for data validation (`server/app/core/models.py`)
-- Environment variables loaded via pydantic-settings (`server/app/core/config.py`)
+- All TypeScript functions must have proper type annotations
+- Use interfaces and types for data validation
+- Environment variables loaded via dotenv configuration
+- Follow clean architecture patterns with dependency injection
 
 ### Function Calling Tools
 
-#### Current Python Implementation
-The Gemini service implements these tools:
-- `write_file`: Create or update files
-- `read_file`: Read file contents
-- `run_shell_command`: Execute shell commands
-- `finish`: Complete the task with a summary
-
-#### New TypeScript Implementation (TDD Approach)
+#### TypeScript Implementation (TDD Approach)
 **Status: 23/23 tests passing** ✅
 - **ShellTool**: Execute shell commands with proper error handling
 - **ReadFileTool**: Read file contents with validation and error handling
@@ -198,7 +183,7 @@ Required in `docker-compose.yml`:
 ### 🚨 Problemas Críticos Encontrados y Soluciones
 
 #### 1. **Directorio Incorrecto de Deployment**
-- **Problema**: Se estaba deployando desde `server/` (Python) en lugar de `server-ts/` (TypeScript)
+- **Problema**: Se estaba deployando desde `server/` (legacy) en lugar de `server-ts/` (TypeScript)
 - **Síntoma**: Endpoint `/health` devolvía 404 Not Found
 - **Solución**: Cambiar deployment a usar `server-ts/docker-compose.production.yml`
 - **Lección**: Siempre verificar que el directorio de deployment coincida con la tecnología actual
@@ -295,10 +280,10 @@ Required in `docker-compose.yml`:
 Migrar completamente el proyecto a TypeScript, eliminando todo el código Python legacy para tener una arquitectura unificada.
 
 ### Issues Creados
-1. **#90** - Migrar cliente de Python a TypeScript
+1. **#90** - Migrar cliente a TypeScript
 2. **#94** - Agregar tests de integración
 3. **#91** - Actualizar GitHub Workflow para usar TypeScript
-4. **#92** - Eliminar código Python legacy
+4. **#92** - Eliminar código legacy
 5. **#93** - Actualizar documentación CLAUDE.md
 6. ~~**#95**~~ - ~~Crear capa de compatibilidad~~ (CERRADO - No necesario)
 
@@ -312,21 +297,21 @@ Migrar completamente el proyecto a TypeScript, eliminando todo el código Python
    - Validar funcionamiento end-to-end
 
 3. **Fase 3 - Limpieza** (#92, #93)
-   - Eliminar todo código Python
+   - Eliminar todo código legacy
    - Actualizar documentación
 
 ### Estado de Migración - COMPLETADO ✅
 - ✅ **Cliente TypeScript** - Migrado completamente (#90)
 - ✅ **Tests de integración** - Tests TDD implementados (23/23 passing) (#94)
 - ✅ **GitHub Workflow actualizado** - Usando Node.js y TypeScript (#91)
-- ⏳ **Código Python eliminado** - Pendiente de hacer cleanup (#92)
+- ✅ **Código Python eliminado** - Legacy code cleanup completado (#92)
 - ✅ **Documentación actualizada** - CLAUDE.md actualizado con estado actual (#93)
 - ✅ **Sistema de logging** - Implementado para debugging
 - ✅ **Working directory fix** - Tools funcionando en directorio correcto
 - ✅ **Producción funcionando** - Issue #103 procesado exitosamente
 
 ### 🎯 Siguientes Pasos
-1. **Cleanup opcional**: Eliminar directorio `server/` (Python legacy) cuando se confirme estabilidad
+1. **Implementar nuevos tools**: Comenzar con Fase 1 del roadmap (Git y GitHub, Manipulación de Archivos)
 2. **Monitoreo**: Usar sistema de logging para identificar cualquier problema en producción
 3. **Optimizaciones**: Considerar mejoras de performance basadas en logs de uso real
 
