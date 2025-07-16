@@ -27,12 +27,14 @@ ISSUE_BODY = os.getenv("ISSUE_BODY")
 ISSUE_NUMBER = os.getenv("ISSUE_NUMBER")
 PROMPT_BODY = os.getenv("PROMPT_BODY")
 GEMINI_AGENT_API_URL = os.getenv("GEMINI_AGENT_API_URL")
+INITIAL_COMMENT_ID = os.getenv("INITIAL_COMMENT_ID")
 
 logger.info(f"Initial Environment Variables:")
 logger.info(f"  Issue Title: {ISSUE_TITLE}")
 logger.info(f"  Issue Body: {ISSUE_BODY}")
 logger.info(f"  Prompt Body: {PROMPT_BODY}")
 logger.info(f"  API URL: {GEMINI_AGENT_API_URL}")
+logger.info(f"  Initial Comment ID: {INITIAL_COMMENT_ID}")
 
 # Create a new branch for the changes
 BRANCH_NAME = f"gemini-issue-{ISSUE_NUMBER}"
@@ -111,17 +113,26 @@ while True:
                 
                 logger.info(f"Pull Request link created: {pr_link}")
                 
-                # Comment on the issue with the PR link
+                # Edit the initial comment with the final result
                 comment_body = f"Gemini finished @{GITHUB_TOKEN.split('_')[0] if GITHUB_TOKEN else 'yarlen27'}'s task — [Create PR →]({pr_link})\n\n✅ **Completed**: {agent_response.get('message', 'Task completed successfully.')}"
                 
                 try:
-                    subprocess.run([
-                        "gh", "issue", "comment", ISSUE_NUMBER, 
-                        "--body", comment_body
-                    ], check=True)
-                    logger.info(f"Commented on issue #{ISSUE_NUMBER} with PR link")
+                    if INITIAL_COMMENT_ID:
+                        subprocess.run([
+                            "gh", "api", f"repos/yarlen27/gemini_agent/issues/comments/{INITIAL_COMMENT_ID}",
+                            "--method", "PATCH",
+                            "--field", f"body={comment_body}"
+                        ], check=True)
+                        logger.info(f"Edited initial comment {INITIAL_COMMENT_ID} with final result")
+                    else:
+                        # Fallback to creating new comment if no initial comment ID
+                        subprocess.run([
+                            "gh", "issue", "comment", ISSUE_NUMBER, 
+                            "--body", comment_body
+                        ], check=True)
+                        logger.info(f"Created new comment on issue #{ISSUE_NUMBER} with PR link")
                 except subprocess.CalledProcessError as e:
-                    logger.error(f"Failed to comment on issue: {e}")
+                    logger.error(f"Failed to update comment: {e}")
                 
                 print(f"\n🔗 Create Pull Request: {pr_link}")
                 print(f"\n✅ Gemini finished: {agent_response.get('message', 'No message')}")
@@ -162,17 +173,26 @@ while True:
                         
                         logger.info(f"Pull Request link created: {pr_link}")
                         
-                        # Comment on the issue with the PR link
+                        # Edit the initial comment with the final result
                         comment_body = f"Gemini finished @{GITHUB_TOKEN.split('_')[0] if GITHUB_TOKEN else 'yarlen27'}'s task — [Create PR →]({pr_link})\\n\\n✅ **Completed**: {agent_response.get('message', 'Task completed successfully.')}"
                         
                         try:
-                            subprocess.run([
-                                "gh", "issue", "comment", ISSUE_NUMBER, 
-                                "--body", comment_body
-                            ], check=True)
-                            logger.info(f"Commented on issue #{ISSUE_NUMBER} with PR link")
+                            if INITIAL_COMMENT_ID:
+                                subprocess.run([
+                                    "gh", "api", f"repos/yarlen27/gemini_agent/issues/comments/{INITIAL_COMMENT_ID}",
+                                    "--method", "PATCH",
+                                    "--field", f"body={comment_body}"
+                                ], check=True)
+                                logger.info(f"Edited initial comment {INITIAL_COMMENT_ID} with final result")
+                            else:
+                                # Fallback to creating new comment if no initial comment ID
+                                subprocess.run([
+                                    "gh", "issue", "comment", ISSUE_NUMBER, 
+                                    "--body", comment_body
+                                ], check=True)
+                                logger.info(f"Created new comment on issue #{ISSUE_NUMBER} with PR link")
                         except subprocess.CalledProcessError as e:
-                            logger.error(f"Failed to comment on issue: {e}")
+                            logger.error(f"Failed to update comment: {e}")
                         
                         print(f"\\n🔗 Create Pull Request: {pr_link}")
                         print(f"\\n✅ Gemini finished: {agent_response.get('message', 'No message')}")
@@ -227,17 +247,26 @@ while True:
                         
                         logger.info(f"Pull Request link created: {pr_link}")
                         
-                        # Comment on the issue with the PR link
+                        # Edit the initial comment with the final result
                         comment_body = f"Gemini finished @{GITHUB_TOKEN.split('_')[0] if GITHUB_TOKEN else 'yarlen27'}'s task — [Create PR →]({pr_link})\\n\\n✅ **Completed**: {agent_response.get('message', 'Task completed successfully.')}"
                         
                         try:
-                            subprocess.run([
-                                "gh", "issue", "comment", ISSUE_NUMBER, 
-                                "--body", comment_body
-                            ], check=True)
-                            logger.info(f"Commented on issue #{ISSUE_NUMBER} with PR link")
+                            if INITIAL_COMMENT_ID:
+                                subprocess.run([
+                                    "gh", "api", f"repos/yarlen27/gemini_agent/issues/comments/{INITIAL_COMMENT_ID}",
+                                    "--method", "PATCH",
+                                    "--field", f"body={comment_body}"
+                                ], check=True)
+                                logger.info(f"Edited initial comment {INITIAL_COMMENT_ID} with final result")
+                            else:
+                                # Fallback to creating new comment if no initial comment ID
+                                subprocess.run([
+                                    "gh", "issue", "comment", ISSUE_NUMBER, 
+                                    "--body", comment_body
+                                ], check=True)
+                                logger.info(f"Created new comment on issue #{ISSUE_NUMBER} with PR link")
                         except subprocess.CalledProcessError as e:
-                            logger.error(f"Failed to comment on issue: {e}")
+                            logger.error(f"Failed to update comment: {e}")
                         
                         print(f"\\n🔗 Create Pull Request: {pr_link}")
                         print(f"\\n✅ Gemini finished: {agent_response.get('message', 'No message')}")
@@ -299,17 +328,26 @@ while True:
                         
                         logger.info(f"Pull Request link created: {pr_link}")
                         
-                        # Comment on the issue with the PR link
+                        # Edit the initial comment with the final result
                         comment_body = f"Gemini finished @{GITHUB_TOKEN.split('_')[0] if GITHUB_TOKEN else 'yarlen27'}'s task — [Create PR →]({pr_link})\\n\\n✅ **Completed**: {agent_response.get('message', 'Task completed successfully.')}"
                         
                         try:
-                            subprocess.run([
-                                "gh", "issue", "comment", ISSUE_NUMBER, 
-                                "--body", comment_body
-                            ], check=True)
-                            logger.info(f"Commented on issue #{ISSUE_NUMBER} with PR link")
+                            if INITIAL_COMMENT_ID:
+                                subprocess.run([
+                                    "gh", "api", f"repos/yarlen27/gemini_agent/issues/comments/{INITIAL_COMMENT_ID}",
+                                    "--method", "PATCH",
+                                    "--field", f"body={comment_body}"
+                                ], check=True)
+                                logger.info(f"Edited initial comment {INITIAL_COMMENT_ID} with final result")
+                            else:
+                                # Fallback to creating new comment if no initial comment ID
+                                subprocess.run([
+                                    "gh", "issue", "comment", ISSUE_NUMBER, 
+                                    "--body", comment_body
+                                ], check=True)
+                                logger.info(f"Created new comment on issue #{ISSUE_NUMBER} with PR link")
                         except subprocess.CalledProcessError as e:
-                            logger.error(f"Failed to comment on issue: {e}")
+                            logger.error(f"Failed to update comment: {e}")
                         
                         print(f"\\n🔗 Create Pull Request: {pr_link}")
                         print(f"\\n✅ Gemini finished: {agent_response.get('message', 'No message')}")

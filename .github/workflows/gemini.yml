@@ -38,12 +38,14 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Initial Gemini Comment
+        id: initial_comment
         run: |
-          gh issue comment ${{ github.event.issue.number }} --body "🔷 Gemini is working...
+          COMMENT_ID=$(gh issue comment ${{ github.event.issue.number }} --body "🔷 Gemini is working...
 
           I'll analyze this and get back to you.
 
-          [View job run →](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+          [View job run →](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})" --json id --jq .id)
+          echo "comment_id=$COMMENT_ID" >> $GITHUB_OUTPUT
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -58,6 +60,8 @@ jobs:
           PROMPT_BODY: ${{ github.event.comment.body || github.event.issue.body }}
           # Our API server URL
           GEMINI_AGENT_API_URL: "https://gemini.27cobalto.com"
+          # Pass the comment ID to edit later
+          INITIAL_COMMENT_ID: ${{ steps.initial_comment.outputs.comment_id }}
         run: python .github/scripts/client.py
 
       - name: Create Pull Request
