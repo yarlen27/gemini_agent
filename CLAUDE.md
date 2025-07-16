@@ -329,3 +329,109 @@ Migrar completamente el proyecto a TypeScript, eliminando todo el código Python
 1. **Cleanup opcional**: Eliminar directorio `server/` (Python legacy) cuando se confirme estabilidad
 2. **Monitoreo**: Usar sistema de logging para identificar cualquier problema en producción
 3. **Optimizaciones**: Considerar mejoras de performance basadas en logs de uso real
+
+## 🔮 Tools Futuros - Roadmap de Expansión
+
+### 📁 **Manipulación de Archivos**
+- `copy_file_to_directory` - Copiar archivos a directorios específicos
+- `rename_file_with_pattern` - Renombrar archivos usando patrones
+- `delete_files_by_extension` - Eliminar archivos por extensión
+- `create_directory_structure` - Crear estructura de directorios
+- `search_text_in_files` - Buscar texto específico en archivos
+- `replace_text_in_files` - Reemplazar texto en múltiples archivos
+- `get_file_size_and_permissions` - Obtener metadata de archivos
+- `compress_directory_to_zip` - Comprimir directorios
+- `extract_zip_to_directory` - Extraer archivos comprimidos
+
+### 🔀 **Git y GitHub**
+- `create_branch_from_main` - Crear branch desde main
+- `merge_branch_with_squash` - Merge con squash
+- `create_pull_request_with_template` - Crear PR con template
+- `add_comment_to_issue` - Agregar comentarios a issues
+- `close_issue_with_message` - Cerrar issues con mensaje
+- `get_diff_between_branches` - Obtener diferencias entre branches
+- `cherry_pick_commit` - Cherry pick de commits específicos
+- `revert_specific_commit` - Revertir commits específicos
+- `tag_current_commit` - Crear tags en commits
+
+### 🐘 **PostgreSQL y SQL**
+- `create_table_with_columns` - Crear tablas con columnas específicas
+- `insert_sample_data_to_table` - Insertar datos de prueba
+- `backup_table_to_file` - Backup de tablas específicas
+- `run_select_query_with_limit` - Ejecutar queries con límites
+- `create_index_on_column` - Crear índices en columnas
+- `drop_table_if_exists` - Eliminar tablas si existen
+- `update_rows_where_condition` - Actualizar filas con condiciones
+- `get_table_schema_info` - Obtener información de esquemas
+
+### 📚 **Documentación**
+- `generate_readme_from_package_json` - Generar README desde package.json
+- `create_api_endpoint_documentation` - Documentar endpoints de API
+- `add_jsdoc_comments_to_functions` - Agregar JSDoc a funciones
+- `update_changelog_with_version` - Actualizar changelog con versiones
+- `generate_type_definitions_docs` - Documentar definiciones de tipos
+- `create_installation_guide` - Crear guías de instalación
+
+### 📦 **Gestión de Dependencias**
+- `install_npm_package_as_dev_dependency` - Instalar dependencias de desarrollo
+- `update_package_to_latest_version` - Actualizar packages a última versión
+- `remove_unused_dependencies` - Eliminar dependencias no utilizadas
+- `check_package_vulnerabilities` - Verificar vulnerabilidades
+- `install_python_requirements_from_file` - Instalar requirements Python
+- `add_composer_package_with_version` - Agregar packages PHP
+
+### 🧪 **Testing y Calidad**
+- `run_jest_tests_for_specific_file` - Ejecutar tests Jest específicos
+- `run_unit_tests_with_coverage_report` - Tests unitarios con coverage
+- `run_eslint_on_src_directory` - Ejecutar ESLint en directorios
+- `format_code_with_prettier` - Formatear código con Prettier
+- `run_typescript_type_check` - Verificación de tipos TypeScript
+- `execute_integration_tests_only` - Ejecutar solo tests de integración
+
+### 🌐 **APIs y HTTP**
+- `send_post_request_with_json_body` - Enviar requests POST con JSON
+- `test_get_endpoint_response_status` - Probar status de endpoints
+- `upload_file_via_multipart_form` - Subir archivos multipart
+- `download_file_from_url_to_path` - Descargar archivos desde URLs
+- `send_webhook_payload_to_url` - Enviar payloads de webhooks
+
+### ⚙️ **Configuración**
+- `set_environment_variable_in_dotenv` - Configurar variables en .env
+- `read_config_value_from_json` - Leer valores de configuración
+- `encrypt_secret_with_key` - Encriptar secretos
+- `validate_required_env_variables` - Validar variables requeridas
+- `merge_config_files` - Combinar archivos de configuración
+
+### 🐳 **Docker y DevOps**
+- `build_docker_image_with_tag` - Construir imágenes Docker con tags
+- `run_container_with_port_mapping` - Ejecutar contenedores con puertos
+- `stop_all_containers_by_pattern` - Detener contenedores por patrón
+- `docker_compose_up_specific_service` - Levantar servicios específicos
+- `get_container_logs_last_n_lines` - Obtener logs de contenedores
+
+### 💾 **Bases de Datos Generales**
+- `mongodb_insert_document_to_collection` - Insertar documentos MongoDB
+- `redis_set_key_with_expiration` - Configurar keys Redis con expiración
+- `mysql_create_user_with_permissions` - Crear usuarios MySQL
+- `elasticsearch_index_document` - Indexar documentos Elasticsearch
+
+### 🎯 **Priorización de Implementación**
+**Fase 1** (Alta prioridad):
+1. **Git y GitHub** - Operaciones git avanzadas
+2. **Manipulación de Archivos** - Búsqueda y organización
+3. **Testing y Calidad** - Validación automatizada
+
+**Fase 2** (Media prioridad):
+4. **Gestión de Dependencias** - Manejo de packages
+5. **APIs y HTTP** - Testing de endpoints
+6. **Configuración** - Gestión de entornos
+
+**Fase 3** (Expansión):
+7. **PostgreSQL y SQL** - Operaciones de base de datos
+8. **Docker y DevOps** - Automatización de deployment
+9. **Documentación** - Generación automática
+
+## Memories
+
+### Project Management
+- **Guarda el estado del proyecto**
