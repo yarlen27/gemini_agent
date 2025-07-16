@@ -21,7 +21,7 @@ app.use(express.json());
 
 // Initialize services
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyDVkgRk8wG9dU5k9h4AIfFkitAkrYTfFz8';
-const GITHUB_TOKEN = process.env.GITHUB_TOKEN || '';
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN || 'dummy-token-for-startup';
 
 // Initialize tool registry
 const toolRegistry = new ToolRegistry();
