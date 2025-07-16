@@ -39,10 +39,12 @@ BRANCH_NAME = f"gemini-issue-{ISSUE_NUMBER}"
 logger.info(f"Creating new branch: {BRANCH_NAME}")
 try:
     subprocess.run(f"git checkout -b {BRANCH_NAME}", shell=True, check=True)
-    subprocess.run(f"git push origin {BRANCH_NAME}", shell=True, check=True) # Push empty branch
+    # Skip push for local testing
+    # subprocess.run(f"git push origin {BRANCH_NAME}", shell=True, check=True) # Push empty branch
 except subprocess.CalledProcessError as e:
     logger.error(f"Error creating branch: {e.stderr}")
-    exit(1)
+    # Don't exit for local testing
+    # exit(1)
 
 conversation_id = None
 
@@ -133,9 +135,15 @@ while True:
             content = agent_response["content"]
             try:
                 # Ensure directory exists
-                os.makedirs(os.path.dirname(file_path), exist_ok=True)
+                dir_path = os.path.dirname(file_path)
+                if dir_path:  # Only create directory if file_path contains a directory
+                    os.makedirs(dir_path, exist_ok=True)
+                
+                logger.info(f"Writing to file: {file_path}")
+                logger.info(f"Content length: {len(content)} characters")
                 with open(file_path, 'w') as f:
                     f.write(content)
+                logger.info(f"File written successfully: {file_path}")
                 tool_result = {"tool_name": "write_file", "file_path": file_path, "stdout": "File written successfully"}
             except Exception as e:
                 tool_result = {"tool_name": "write_file", "file_path": file_path, "stderr": str(e), "exit_code": 1}
