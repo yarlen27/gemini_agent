@@ -9,12 +9,15 @@ router = APIRouter()
 
 @router.post("/v1/github/execute", response_model=AgentResponse)
 async def execute_github_step(request: AgentRequest):
+    print(f"DEBUG: Received request - conversation_id: {request.conversation_id}, has_prompt: {bool(request.prompt)}, has_tool_response: {bool(request.tool_response)}")
+    
     conversation_id = request.conversation_id
     if not conversation_id:
         conversation_id = str(uuid.uuid4())
         history = []
     else:
         history = await redis_service.get_conversation(conversation_id)
+        print(f"DEBUG: Retrieved history length: {len(history)}")
 
     # Add the current request to the history
     if request.prompt:
@@ -65,7 +68,17 @@ Continue with your task. What is your next action?
             ]
         }
         history.append(tool_output)
+    else:
+        # Neither prompt nor tool_response provided
+        print(f"DEBUG: No prompt or tool_response provided. Current history: {history}")
+        if not history:
+            return AgentResponse(
+                conversation_id=conversation_id, 
+                action="finish", 
+                message="Error: No prompt or tool response provided and no conversation history found."
+            )
 
+    print(f"DEBUG: About to call Gemini with history length: {len(history)}")
     # Get response from Gemini
     gemini_response_text = await gemini_service.generate_response(history)
     history.append({"role": "model", "parts": gemini_response_text})
@@ -73,6 +86,7 @@ Continue with your task. What is your next action?
     await redis_service.save_conversation(conversation_id, history)
 
     # Parse Gemini's response to determine the next action
+    print(f"DEBUG: Gemini response: {gemini_response_text}")
     try:
         gemini_action = json.loads(gemini_response_text)
         action = gemini_action.get("action")
