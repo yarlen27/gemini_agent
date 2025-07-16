@@ -14,6 +14,18 @@ def run_shell_command(command: str) -> str:
     """Executes a shell command."""
     return f"run_shell_command:{command}"
 
+def list_directory(path: str = ".") -> str:
+    """Lists directory contents using modern exa (fallback to ls)."""
+    return f"list_directory:{path}"
+
+def glob_files(pattern: str, path: str = ".") -> str:
+    """Finds files matching pattern using modern fd (fallback to find)."""
+    return f"glob_files:{pattern}:{path}"
+
+def grep_content(pattern: str, path: str = ".", file_type: str = "") -> str:
+    """Searches content using modern rg (fallback to grep)."""
+    return f"grep_content:{pattern}:{path}:{file_type}"
+
 def finish(message: str) -> str:
     """Indicates task completion."""
     return f"finish:{message}"
@@ -26,7 +38,7 @@ class GeminiService:
         genai.configure(api_key=settings.GEMINI_API_KEY)
         
         # Use actual Python functions for tools
-        self.tools = [write_file, read_file, run_shell_command, finish]
+        self.tools = [write_file, read_file, run_shell_command, list_directory, glob_files, grep_content, finish]
         
         # Configure function calling mode
         self.generation_config = genai.GenerationConfig(

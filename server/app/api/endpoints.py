@@ -38,6 +38,9 @@ You have access to the following tools:
 - write_file: Create or update a file
 - read_file: Read file contents
 - run_shell_command: Execute shell commands
+- list_directory: List directory contents
+- glob_files: Find files by pattern
+- grep_content: Search content in files
 - finish: Complete the task with a summary message
 
 Analyze the issue and complete the requested task. Work autonomously and use the tools as needed.
@@ -98,6 +101,12 @@ Continue with your task. What is your next action?
             return AgentResponse(conversation_id=conversation_id, action="read_file", file_path=gemini_action.get("file_path"))
         elif action == "write_file":
             return AgentResponse(conversation_id=conversation_id, action="write_file", file_path=gemini_action.get("file_path"), content=gemini_action.get("content"))
+        elif action == "list_directory":
+            return AgentResponse(conversation_id=conversation_id, action="list_directory", file_path=gemini_action.get("path", "."))
+        elif action == "glob_files":
+            return AgentResponse(conversation_id=conversation_id, action="glob_files", file_path=gemini_action.get("path", "."), content=gemini_action.get("pattern"))
+        elif action == "grep_content":
+            return AgentResponse(conversation_id=conversation_id, action="grep_content", file_path=gemini_action.get("path", "."), content=gemini_action.get("pattern"), command=gemini_action.get("file_type", ""))
         else:
             return AgentResponse(conversation_id=conversation_id, action="finish", message=f"Unknown action from Gemini: {action}. Raw response: {gemini_response_text}")
     except json.JSONDecodeError:
