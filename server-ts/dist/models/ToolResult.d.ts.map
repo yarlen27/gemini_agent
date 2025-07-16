@@ -1,0 +1,1 @@
+{"version":3,"file":"ToolResult.d.ts","sourceRoot":"","sources":["../../src/models/ToolResult.ts"],"names":[],"mappings":"AAAA,MAAM,WAAW,UAAU;IACvB,OAAO,EAAE,OAAO,CAAC;IACjB,IAAI,CAAC,EAAE,GAAG,CAAC;IACX,KAAK,CAAC,EAAE,MAAM,CAAC;IACf,MAAM,CAAC,EAAE,MAAM,CAAC;IAChB,MAAM,CAAC,EAAE,MAAM,CAAC;IAChB,QAAQ,CAAC,EAAE,MAAM,CAAC;CACrB"}

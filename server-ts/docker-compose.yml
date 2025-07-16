@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  gemini-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8001"
+    environment:
+      - GEMINI_API_KEY=AIzaSyDVkgRk8wG9dU5k9h4AIfFkitAkrYTfFz8
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - PORT=8001
+    volumes:
+      - /tmp/gemini-repos:/tmp/gemini-repos
+    restart: unless-stopped
+    depends_on:
+      - redis
+    networks:
+      - gemini-network
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+    networks:
+      - gemini-network
+
+volumes:
+  redis-data:
+
+networks:
+  gemini-network:
+    driver: bridge

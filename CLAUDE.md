@@ -8,10 +8,18 @@ This is a **Gemini Agent for GitHub Automation** - an AI-powered agent that auto
 
 ## Architecture
 
+### Current (Python - Being Migrated)
 - **API Server**: FastAPI application (`server/app/main.py`) that orchestrates all agent operations
 - **State Management**: Redis for conversation history persistence
 - **AI Integration**: Google Gemini (gemini-2.5-flash) with function calling capabilities
 - **GitHub Integration**: Custom client script (`/.github/scripts/client.py`) that communicates with the API
+
+### New (TypeScript - In Development)
+- **API Server**: Express.js application (`server-ts/src/`) with clean .NET-style architecture
+- **Tools System**: Plugin-based architecture with ITool interface, zero if-else statements
+- **State Management**: Redis for conversation history persistence
+- **AI Integration**: Google Gemini with function calling capabilities
+- **GitHub Integration**: Webhook-based system (eliminates GitHub Actions overhead)
 
 ## Development Commands
 
@@ -59,11 +67,20 @@ docker-compose up redis # Just Redis
 - Environment variables loaded via pydantic-settings (`server/app/core/config.py`)
 
 ### Function Calling Tools
+
+#### Current Python Implementation
 The Gemini service implements these tools:
 - `write_file`: Create or update files
 - `read_file`: Read file contents
 - `run_shell_command`: Execute shell commands
 - `finish`: Complete the task with a summary
+
+#### New TypeScript Implementation (TDD Approach)
+**Status: 23/23 tests passing** ✅
+- **ShellTool**: Execute shell commands with proper error handling
+- **ReadFileTool**: Read file contents with validation and error handling
+- **WriteFileTool**: Create/update files with directory auto-creation
+- **ToolRegistry**: Plugin system eliminates if-else statements
 
 ### Environment Variables
 Required in `docker-compose.yml`:

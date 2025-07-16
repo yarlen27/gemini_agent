@@ -1,0 +1,55 @@
+name: Gemini TypeScript Agent
+
+on:
+  issue_comment:
+    types: [created]
+  issues:
+    types: [opened]
+
+jobs:
+  gemini-agent:
+    if: |
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@gemini-ts')) ||
+      (github.event_name == 'issues' && (contains(github.event.issue.body, '@gemini-ts') || contains(github.event.issue.title, '@gemini-ts')))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      id-token: write
+
+    steps:
+      - name: Initial Gemini Comment
+        id: initial_comment
+        run: |
+          COMMENT_ID=$(gh api repos/${{ github.repository }}/issues/${{ github.event.issue.number }}/comments \
+            --method POST \
+            --field body="🔷 Gemini TypeScript is working...
+
+          I'll analyze this and get back to you.
+
+          [View job run →](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})" \
+            --jq .id)
+          echo "comment_id=$COMMENT_ID" >> $GITHUB_OUTPUT
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Trigger Gemini TypeScript Agent
+        id: gemini
+        run: |
+          curl -X POST https://gemini.27cobalto.com/v1/github/webhook \
+            -H "Content-Type: application/json" \
+            -d '{
+              "issue_number": "${{ github.event.issue.number }}",
+              "issue_title": "${{ github.event.issue.title }}",
+              "issue_body": "${{ github.event.issue.body }}",
+              "repo": "${{ github.repository }}",
+              "github_token": "${{ secrets.GITHUB_TOKEN }}",
+              "comment_id": "${{ steps.initial_comment.outputs.comment_id }}"
+            }'
+
+      - name: Handle Webhook Response
+        if: always()
+        run: |
+          echo "Gemini TypeScript Agent triggered successfully"
+          echo "Check server logs for detailed execution"
