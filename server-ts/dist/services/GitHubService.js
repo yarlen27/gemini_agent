@@ -24,6 +24,10 @@ class GitHubService {
             const git = (0, simple_git_1.default)();
             const cloneUrl = `https://${this.token}@github.com/${repo}.git`;
             await git.clone(cloneUrl, repoPath);
+            // Configure git user for the cloned repository
+            const repoGit = (0, simple_git_1.default)(repoPath);
+            await repoGit.addConfig('user.name', 'github-actions[bot]');
+            await repoGit.addConfig('user.email', 'github-actions[bot]@users.noreply.github.com');
             return {
                 success: true,
                 data: `Repository cloned successfully to ${repoPath}`

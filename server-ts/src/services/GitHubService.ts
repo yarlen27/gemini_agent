@@ -28,6 +28,11 @@ export class GitHubService {
             
             await git.clone(cloneUrl, repoPath);
             
+            // Configure git user for the cloned repository
+            const repoGit = simpleGit(repoPath);
+            await repoGit.addConfig('user.name', 'github-actions[bot]');
+            await repoGit.addConfig('user.email', 'github-actions[bot]@users.noreply.github.com');
+            
             return {
                 success: true,
                 data: `Repository cloned successfully to ${repoPath}`
