@@ -1,11 +1,13 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { ToolRegistry } from '../tools/ToolRegistry';
 import { GeminiResponse } from '../models/GeminiResponse';
+import { Logger } from '../utils/Logger';
 
 export class GeminiService {
     private genAI: GoogleGenerativeAI;
     private model: any;
     private toolRegistry: ToolRegistry;
+    private logger: Logger;
 
     constructor(apiKey: string, toolRegistry: ToolRegistry) {
         if (!apiKey) {
@@ -14,6 +16,7 @@ export class GeminiService {
 
         this.genAI = new GoogleGenerativeAI(apiKey);
         this.toolRegistry = toolRegistry;
+        this.logger = Logger.getInstance();
         
         // Configure the model
         this.model = this.genAI.getGenerativeModel({
@@ -24,7 +27,7 @@ export class GeminiService {
         });
     }
 
-    public async generateResponse(history: any[]): Promise<GeminiResponse> {
+    public async generateResponse(history: any[], conversationId?: string, issueNumber?: string): Promise<GeminiResponse> {
         try {
             // Add system prompt with available tools
             const systemPrompt = this.buildSystemPrompt();
@@ -36,6 +39,23 @@ export class GeminiService {
                 ...history
             ];
 
+            // Log the request to Gemini
+            await this.logger.logGeminiConversation(
+                conversationId || 'unknown',
+                issueNumber || 'unknown',
+                'generateResponse',
+                'request',
+                {
+                    historyLength: history.length,
+                    systemPrompt: systemPrompt.substring(0, 200) + '...',
+                    fullHistory: fullHistory.map(h => ({ 
+                        role: h.role, 
+                        partsCount: h.parts.length, 
+                        textPreview: h.parts[0]?.text?.substring(0, 100) + '...' 
+                    }))
+                }
+            );
+
             const result = await this.model.generateContent({
                 contents: fullHistory,
             });
@@ -43,9 +63,35 @@ export class GeminiService {
             const response = result.response;
             const text = response.text();
 
+            // Log the raw response from Gemini
+            await this.logger.logGeminiConversation(
+                conversationId || 'unknown',
+                issueNumber || 'unknown',
+                'generateResponse',
+                'response',
+                {
+                    rawResponse: text,
+                    responseLength: text.length
+                }
+            );
+
             // Parse JSON response
             try {
                 const parsedResponse = JSON.parse(text);
+                
+                // Log the parsed response
+                await this.logger.logGeminiConversation(
+                    conversationId || 'unknown',
+                    issueNumber || 'unknown',
+                    'generateResponse',
+                    'response',
+                    {
+                        parsedResponse: parsedResponse,
+                        action: parsedResponse.action,
+                        hasMessage: !!parsedResponse.message
+                    }
+                );
+
                 return {
                     conversation_id: '', // Will be set by controller
                     action: parsedResponse.action || 'finish',

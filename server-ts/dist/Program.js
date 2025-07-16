@@ -9,6 +9,7 @@ const dotenv_1 = require("dotenv");
 const GeminiService_1 = require("./services/GeminiService");
 const GitHubService_1 = require("./services/GitHubService");
 const WebhookController_1 = require("./controllers/WebhookController");
+const LogsController_1 = require("./controllers/LogsController");
 const ToolRegistry_1 = require("./tools/ToolRegistry");
 const ShellTool_1 = require("./tools/implementations/ShellTool");
 const ReadFileTool_1 = require("./tools/implementations/ReadFileTool");
@@ -33,8 +34,13 @@ const geminiService = new GeminiService_1.GeminiService(GEMINI_API_KEY, toolRegi
 const githubService = new GitHubService_1.GitHubService(GITHUB_TOKEN);
 // Initialize controllers
 const webhookController = new WebhookController_1.WebhookController(geminiService, githubService, toolRegistry);
+const logsController = new LogsController_1.LogsController();
 // Routes
 app.post('/v1/github/webhook', webhookController.handleWebhook.bind(webhookController));
+// Debug and logging endpoints
+app.get('/logs/conversation/:conversationId', logsController.getConversationLogs.bind(logsController));
+app.get('/logs/debug', logsController.getDebugLogs.bind(logsController));
+app.post('/logs/simulate', logsController.simulateRequest.bind(logsController));
 // Health check
 app.get('/health', (req, res) => {
     res.json({

@@ -4,6 +4,7 @@ import { config } from 'dotenv';
 import { GeminiService } from './services/GeminiService';
 import { GitHubService } from './services/GitHubService';
 import { WebhookController } from './controllers/WebhookController';
+import { LogsController } from './controllers/LogsController';
 import { ToolRegistry } from './tools/ToolRegistry';
 import { ShellTool } from './tools/implementations/ShellTool';
 import { ReadFileTool } from './tools/implementations/ReadFileTool';
@@ -35,9 +36,15 @@ const githubService = new GitHubService(GITHUB_TOKEN);
 
 // Initialize controllers
 const webhookController = new WebhookController(geminiService, githubService, toolRegistry);
+const logsController = new LogsController();
 
 // Routes
 app.post('/v1/github/webhook', webhookController.handleWebhook.bind(webhookController));
+
+// Debug and logging endpoints
+app.get('/logs/conversation/:conversationId', logsController.getConversationLogs.bind(logsController));
+app.get('/logs/debug', logsController.getDebugLogs.bind(logsController));
+app.post('/logs/simulate', logsController.simulateRequest.bind(logsController));
 
 // Health check
 app.get('/health', (req, res) => {

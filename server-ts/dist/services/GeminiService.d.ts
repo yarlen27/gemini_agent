@@ -4,8 +4,9 @@ export declare class GeminiService {
     private genAI;
     private model;
     private toolRegistry;
+    private logger;
     constructor(apiKey: string, toolRegistry: ToolRegistry);
-    generateResponse(history: any[]): Promise<GeminiResponse>;
+    generateResponse(history: any[], conversationId?: string, issueNumber?: string): Promise<GeminiResponse>;
     private buildSystemPrompt;
 }
 //# sourceMappingURL=GeminiService.d.ts.map

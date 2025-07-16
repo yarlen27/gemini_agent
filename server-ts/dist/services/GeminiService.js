@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GeminiService = void 0;
 const generative_ai_1 = require("@google/generative-ai");
+const Logger_1 = require("../utils/Logger");
 class GeminiService {
     constructor(apiKey, toolRegistry) {
         if (!apiKey) {
@@ -9,6 +10,7 @@ class GeminiService {
         }
         this.genAI = new generative_ai_1.GoogleGenerativeAI(apiKey);
         this.toolRegistry = toolRegistry;
+        this.logger = Logger_1.Logger.getInstance();
         // Configure the model
         this.model = this.genAI.getGenerativeModel({
             model: 'gemini-2.5-flash',
@@ -17,7 +19,7 @@ class GeminiService {
             },
         });
     }
-    async generateResponse(history) {
+    async generateResponse(history, conversationId, issueNumber) {
         try {
             // Add system prompt with available tools
             const systemPrompt = this.buildSystemPrompt();
@@ -28,14 +30,35 @@ class GeminiService {
                 },
                 ...history
             ];
+            // Log the request to Gemini
+            await this.logger.logGeminiConversation(conversationId || 'unknown', issueNumber || 'unknown', 'generateResponse', 'request', {
+                historyLength: history.length,
+                systemPrompt: systemPrompt.substring(0, 200) + '...',
+                fullHistory: fullHistory.map(h => ({
+                    role: h.role,
+                    partsCount: h.parts.length,
+                    textPreview: h.parts[0]?.text?.substring(0, 100) + '...'
+                }))
+            });
             const result = await this.model.generateContent({
                 contents: fullHistory,
             });
             const response = result.response;
             const text = response.text();
+            // Log the raw response from Gemini
+            await this.logger.logGeminiConversation(conversationId || 'unknown', issueNumber || 'unknown', 'generateResponse', 'response', {
+                rawResponse: text,
+                responseLength: text.length
+            });
             // Parse JSON response
             try {
                 const parsedResponse = JSON.parse(text);
+                // Log the parsed response
+                await this.logger.logGeminiConversation(conversationId || 'unknown', issueNumber || 'unknown', 'generateResponse', 'response', {
+                    parsedResponse: parsedResponse,
+                    action: parsedResponse.action,
+                    hasMessage: !!parsedResponse.message
+                });
                 return {
                     conversation_id: '', // Will be set by controller
                     action: parsedResponse.action || 'finish',
