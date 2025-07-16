@@ -5,7 +5,7 @@ services:
     build: ./server
     container_name: gemini-api
     environment:
-      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - GEMINI_API_KEY=AIzaSyDVkgRk8wG9dU5k9h4AIfFkitAkrYTfFz8
       - REDIS_HOST=redis
       - REDIS_PORT=6379
     depends_on:
