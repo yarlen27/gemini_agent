@@ -13,7 +13,7 @@ export class GitHubService {
             throw new Error('GitHub token is required');
         }
         this.token = token;
-        this.workDir = '/tmp/gemini-repos';
+        this.workDir = '/app/tmp/gemini-repos';
     }
 
     public async cloneRepository(repo: string, issueNumber: string): Promise<ToolResult> {
