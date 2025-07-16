@@ -1,0 +1,17 @@
+{
+  "name": "gemini-agent-client",
+  "version": "1.0.0",
+  "description": "GitHub Actions client for Gemini Agent",
+  "main": "client.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node client.js"
+  },
+  "dependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

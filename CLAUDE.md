@@ -253,3 +253,37 @@ Required in `docker-compose.yml`:
 - ✅ **Health endpoint** funcionando: https://gemini.27cobalto.com/health
 - ✅ **Todos los servicios** funcionando correctamente
 - ✅ **Documentación** actualizada en CLAUDE.md
+- ⚠️ **Cliente Python desactualizado** - Llama a endpoint incorrecto
+
+## 🚀 Plan de Migración a TypeScript (2025-07-16)
+
+### Objetivo
+Migrar completamente el proyecto a TypeScript, eliminando todo el código Python legacy para tener una arquitectura unificada.
+
+### Issues Creados
+1. **#90** - Migrar cliente de Python a TypeScript
+2. **#94** - Agregar tests de integración
+3. **#91** - Actualizar GitHub Workflow para usar TypeScript
+4. **#92** - Eliminar código Python legacy
+5. **#93** - Actualizar documentación CLAUDE.md
+6. ~~**#95**~~ - ~~Crear capa de compatibilidad~~ (CERRADO - No necesario)
+
+### Orden de Implementación (Simplificado)
+1. **Fase 1 - Migración Core** (#90, #94)
+   - Crear nuevo cliente TypeScript
+   - Implementar tests completos
+
+2. **Fase 2 - Activación** (#91)
+   - Cambiar GitHub Actions a TypeScript
+   - Validar funcionamiento end-to-end
+
+3. **Fase 3 - Limpieza** (#92, #93)
+   - Eliminar todo código Python
+   - Actualizar documentación
+
+### Estado de Migración
+- [ ] Cliente TypeScript
+- [ ] Tests de integración
+- [ ] GitHub Workflow actualizado
+- [ ] Código Python eliminado
+- [ ] Documentación actualizada
