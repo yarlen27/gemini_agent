@@ -110,6 +110,19 @@ while True:
                 pr_link = f"https://github.com/yarlen27/gemini_agent/compare/main...{BRANCH_NAME}?quick_pull=1&title={encoded_title}&body={encoded_body}"
                 
                 logger.info(f"Pull Request link created: {pr_link}")
+                
+                # Comment on the issue with the PR link
+                comment_body = f"Gemini finished @{GITHUB_TOKEN.split('_')[0] if GITHUB_TOKEN else 'yarlen27'}'s task — [Create PR →]({pr_link})\n\n✅ **Completed**: {agent_response.get('message', 'Task completed successfully.')}"
+                
+                try:
+                    subprocess.run([
+                        "gh", "issue", "comment", ISSUE_NUMBER, 
+                        "--body", comment_body
+                    ], check=True)
+                    logger.info(f"Commented on issue #{ISSUE_NUMBER} with PR link")
+                except subprocess.CalledProcessError as e:
+                    logger.error(f"Failed to comment on issue: {e}")
+                
                 print(f"\n🔗 Create Pull Request: {pr_link}")
                 print(f"\n✅ Gemini finished: {agent_response.get('message', 'No message')}")
             except subprocess.CalledProcessError as e:
@@ -148,6 +161,19 @@ while True:
                         pr_link = f"https://github.com/yarlen27/gemini_agent/compare/main...{BRANCH_NAME}?quick_pull=1&title={encoded_title}&body={encoded_body}"
                         
                         logger.info(f"Pull Request link created: {pr_link}")
+                        
+                        # Comment on the issue with the PR link
+                        comment_body = f"Gemini finished @{GITHUB_TOKEN.split('_')[0] if GITHUB_TOKEN else 'yarlen27'}'s task — [Create PR →]({pr_link})\\n\\n✅ **Completed**: {agent_response.get('message', 'Task completed successfully.')}"
+                        
+                        try:
+                            subprocess.run([
+                                "gh", "issue", "comment", ISSUE_NUMBER, 
+                                "--body", comment_body
+                            ], check=True)
+                            logger.info(f"Commented on issue #{ISSUE_NUMBER} with PR link")
+                        except subprocess.CalledProcessError as e:
+                            logger.error(f"Failed to comment on issue: {e}")
+                        
                         print(f"\\n🔗 Create Pull Request: {pr_link}")
                         print(f"\\n✅ Gemini finished: {agent_response.get('message', 'No message')}")
                     except subprocess.CalledProcessError as e:
@@ -199,6 +225,19 @@ while True:
                         pr_link = f"https://github.com/yarlen27/gemini_agent/compare/main...{BRANCH_NAME}?quick_pull=1&title={encoded_title}&body={encoded_body}"
                         
                         logger.info(f"Pull Request link created: {pr_link}")
+                        
+                        # Comment on the issue with the PR link
+                        comment_body = f"Gemini finished @{GITHUB_TOKEN.split('_')[0] if GITHUB_TOKEN else 'yarlen27'}'s task — [Create PR →]({pr_link})\\n\\n✅ **Completed**: {agent_response.get('message', 'Task completed successfully.')}"
+                        
+                        try:
+                            subprocess.run([
+                                "gh", "issue", "comment", ISSUE_NUMBER, 
+                                "--body", comment_body
+                            ], check=True)
+                            logger.info(f"Commented on issue #{ISSUE_NUMBER} with PR link")
+                        except subprocess.CalledProcessError as e:
+                            logger.error(f"Failed to comment on issue: {e}")
+                        
                         print(f"\\n🔗 Create Pull Request: {pr_link}")
                         print(f"\\n✅ Gemini finished: {agent_response.get('message', 'No message')}")
                     except subprocess.CalledProcessError as e:
@@ -257,6 +296,19 @@ while True:
                         pr_link = f"https://github.com/yarlen27/gemini_agent/compare/main...{BRANCH_NAME}?quick_pull=1&title={encoded_title}&body={encoded_body}"
                         
                         logger.info(f"Pull Request link created: {pr_link}")
+                        
+                        # Comment on the issue with the PR link
+                        comment_body = f"Gemini finished @{GITHUB_TOKEN.split('_')[0] if GITHUB_TOKEN else 'yarlen27'}'s task — [Create PR →]({pr_link})\\n\\n✅ **Completed**: {agent_response.get('message', 'Task completed successfully.')}"
+                        
+                        try:
+                            subprocess.run([
+                                "gh", "issue", "comment", ISSUE_NUMBER, 
+                                "--body", comment_body
+                            ], check=True)
+                            logger.info(f"Commented on issue #{ISSUE_NUMBER} with PR link")
+                        except subprocess.CalledProcessError as e:
+                            logger.error(f"Failed to comment on issue: {e}")
+                        
                         print(f"\\n🔗 Create Pull Request: {pr_link}")
                         print(f"\\n✅ Gemini finished: {agent_response.get('message', 'No message')}")
                     except subprocess.CalledProcessError as e:
