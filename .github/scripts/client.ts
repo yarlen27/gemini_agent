@@ -36,12 +36,12 @@ async function main() {
 
   // Prepare webhook payload
   const payload = {
-    issue_number: parseInt(ISSUE_NUMBER),
+    issue_number: ISSUE_NUMBER,
     issue_title: ISSUE_TITLE,
     issue_body: ISSUE_BODY,
     repo: GITHUB_REPOSITORY,
     github_token: GITHUB_TOKEN,
-    comment_id: INITIAL_COMMENT_ID ? parseInt(INITIAL_COMMENT_ID) : null
+    comment_id: INITIAL_COMMENT_ID || null
   };
 
   log(`Sending webhook request...`);
