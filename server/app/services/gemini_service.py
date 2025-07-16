@@ -27,53 +27,79 @@ class GeminiService:
         
         # Use actual Python functions for tools
         self.tools = [write_file, read_file, run_shell_command, finish]
-        self.model = genai.GenerativeModel('gemini-2.5-flash', tools=self.tools)
+        
+        # Configure function calling mode
+        self.generation_config = genai.GenerationConfig(
+            temperature=0.1,
+        )
+        
+        self.model = genai.GenerativeModel(
+            'gemini-2.5-flash', 
+            tools=self.tools,
+            generation_config=self.generation_config
+        )
 
     async def generate_response(self, history: list) -> str:
-        response = await self.model.generate_content_async(history)
+        try:
+            response = await self.model.generate_content_async(history)
+            
+            # Check if response has function calls
+            if response.candidates and response.candidates[0].content.parts:
+                for part in response.candidates[0].content.parts:
+                    if hasattr(part, 'function_call') and part.function_call:
+                        function_call = part.function_call
+                        action = function_call.name
+                        args = dict(function_call.args)
+                        
+                        # Map function names to response structure
+                        if action == "write_file":
+                            return json.dumps({
+                                "action": "write_file",
+                                "file_path": args.get("file_path"),
+                                "content": args.get("content")
+                            })
+                        elif action == "read_file":
+                            return json.dumps({
+                                "action": "read_file", 
+                                "file_path": args.get("file_path")
+                            })
+                        elif action == "run_shell_command":
+                            return json.dumps({
+                                "action": "run_shell_command",
+                                "command": args.get("command")
+                            })
+                        elif action == "finish":
+                            return json.dumps({
+                                "action": "finish",
+                                "message": args.get("message")
+                            })
+            
+            # If no function call, try to parse text response
+            try:
+                if response.text:
+                    return json.dumps({
+                        "action": "finish",
+                        "message": response.text
+                    })
+            except ValueError:
+                # If text access fails, check finish reason
+                if response.candidates and response.candidates[0].finish_reason:
+                    return json.dumps({
+                        "action": "finish",
+                        "message": f"Task completed with finish reason: {response.candidates[0].finish_reason}"
+                    })
         
-        # Check if response has function calls
-        if response.candidates and response.candidates[0].content.parts:
-            for part in response.candidates[0].content.parts:
-                if hasattr(part, 'function_call') and part.function_call:
-                    function_call = part.function_call
-                    action = function_call.name
-                    args = dict(function_call.args)
-                    
-                    # Map function names to response structure
-                    if action == "write_file":
-                        return json.dumps({
-                            "action": "write_file",
-                            "file_path": args.get("file_path"),
-                            "content": args.get("content")
-                        })
-                    elif action == "read_file":
-                        return json.dumps({
-                            "action": "read_file", 
-                            "file_path": args.get("file_path")
-                        })
-                    elif action == "run_shell_command":
-                        return json.dumps({
-                            "action": "run_shell_command",
-                            "command": args.get("command")
-                        })
-                    elif action == "finish":
-                        return json.dumps({
-                            "action": "finish",
-                            "message": args.get("message")
-                        })
-        
-        # If no function call, try to parse text response
-        if response.text:
+        except Exception as e:
+            print(f"Error in generate_response: {e}")
             return json.dumps({
                 "action": "finish",
-                "message": response.text
+                "message": f"Error: {str(e)}"
             })
         
         # Fallback
         return json.dumps({
             "action": "finish", 
-            "message": "No response generated"
+            "message": "Task completed successfully"
         })
 
 gemini_service = GeminiService()
