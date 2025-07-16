@@ -23,23 +23,70 @@ This is a **Gemini Agent for GitHub Automation** - an AI-powered agent that auto
 
 ## Development Commands
 
+### Local Development
 ```bash
 # Start all services (API + Redis)
-docker-compose up --build -d
+cd server && docker compose up --build -d
 
 # View logs
-docker-compose logs -f
+cd server && docker compose logs -f
 
 # Stop services
-docker-compose down
+cd server && docker compose down
 
-# Format Python code
-black .
+# Run tests
+cd server && npm test
 
-# Run individual service
-docker-compose up api  # Just the API
-docker-compose up redis # Just Redis
+# Build TypeScript
+cd server && npm run build
 ```
+
+### Manual Production Deployment Steps
+1. **Push changes**
+   ```bash
+   git add .
+   git commit -m "Deploy: update for production"
+   git push origin main
+   ```
+
+2. **Connect to production server**
+   ```bash
+   ssh root@178.128.133.94
+   ```
+
+3. **Navigate to project directory** (create if first time)
+   ```bash
+   cd /opt/gemini_agent_new
+   # First time only: git clone https://github.com/yarlen27/gemini_agent.git .
+   ```
+
+4. **Edit docker-compose.production.yml** (replace environment variables)
+   ```bash
+   cd server
+   # Change ${GEMINI_API_KEY} to: GEMINI_API_KEY=<YOUR_GEMINI_API_KEY>
+   # Change ${GITHUB_TOKEN} to: GITHUB_TOKEN=<YOUR_GITHUB_TOKEN>
+   ```
+
+5. **Stop existing containers**
+   ```bash
+   docker compose -f docker-compose.production.yml down
+   ```
+
+6. **Pull latest changes**
+   ```bash
+   git pull origin main
+   ```
+
+7. **Build and deploy**
+   ```bash
+   docker compose -f docker-compose.production.yml up --build -d
+   ```
+
+8. **Verify deployment**
+   ```bash
+   docker compose -f docker-compose.production.yml ps
+   curl -s https://gemini.27cobalto.com/health
+   ```
 
 ## Key Components
 
@@ -101,3 +148,19 @@ Required in `docker-compose.yml`:
 - Conversation history is stored with key pattern: `conversation:{repo}:{issue_number}`
 - The agent can resume failed jobs from the last successful step
 - All file paths in function calls should be relative to the repository root
+
+## Production Server Info
+
+### 🚀 Ready for Deployment
+- **Target domain**: gemini.27cobalto.com
+- **Production server**: `root@178.128.133.94`
+- **SSL**: Automatic via Let's Encrypt
+- **Deployment**: Follow Manual Production Deployment Steps above
+- **Services**: API + Redis + Nginx proxy + SSL companion
+
+### 🔧 Production Server Access
+- **SSH Connection**: `ssh root@178.128.133.94`
+- **Claude Code SSH Support**: ✅ YES - SSH connections are supported
+- **Deployment directory**: `/opt/gemini_agent_new`
+- **Server IP**: `178.128.133.94`
+- **Other services running**: Vault (port 8200), OCR services (8000, 8081), PostgreSQL (5432)
