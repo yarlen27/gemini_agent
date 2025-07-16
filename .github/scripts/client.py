@@ -80,7 +80,6 @@ while True:
                 "prompt_body": PROMPT_BODY
             }
         }
-    # TODO: Add tool_response if applicable
 
     logger.info(f"Sending API request: {json.dumps(request_body, indent=2)}")
     try:
@@ -113,9 +112,20 @@ while True:
             break
         elif action == "run_shell_command":
             tool_result = run_shell_command(agent_response["command"])
-            # Send tool_result back to the server in the next iteration
-            request_body["tool_response"] = tool_result
-            continue # Continue the loop to send the tool_response
+            
+            # Send tool response immediately
+            tool_response_body = {"conversation_id": conversation_id, "tool_response": tool_result}
+            logger.info(f"Sending tool response: {json.dumps(tool_response_body, indent=2)}")
+            try:
+                response = requests.post(f"{GEMINI_AGENT_API_URL}/v1/github/execute", json=tool_response_body)
+                response.raise_for_status()
+                agent_response = response.json()
+                logger.info(f"Received API Response after tool: {json.dumps(agent_response, indent=2)}")
+                conversation_id = agent_response["conversation_id"]
+                # Continue processing the new response
+            except requests.exceptions.RequestException as e:
+                logger.critical(f"Error sending tool response: {e}")
+                exit(1)
         elif action == "read_file":
             logger.info(f"Agent requested to read file: {agent_response['file_path']}")
             file_path = agent_response["file_path"]
@@ -127,8 +137,20 @@ while True:
                 tool_result = {"tool_name": "read_file", "file_path": file_path, "stderr": "File not found", "exit_code": 1}
             except Exception as e:
                 tool_result = {"tool_name": "read_file", "file_path": file_path, "stderr": str(e), "exit_code": 1}
-            request_body["tool_response"] = tool_result
-            continue # Continue the loop to send the tool_response
+            
+            # Send tool response immediately
+            tool_response_body = {"conversation_id": conversation_id, "tool_response": tool_result}
+            logger.info(f"Sending tool response: {json.dumps(tool_response_body, indent=2)}")
+            try:
+                response = requests.post(f"{GEMINI_AGENT_API_URL}/v1/github/execute", json=tool_response_body)
+                response.raise_for_status()
+                agent_response = response.json()
+                logger.info(f"Received API Response after tool: {json.dumps(agent_response, indent=2)}")
+                conversation_id = agent_response["conversation_id"]
+                # Continue processing the new response
+            except requests.exceptions.RequestException as e:
+                logger.critical(f"Error sending tool response: {e}")
+                exit(1)
         elif action == "write_file":
             logger.info(f"Agent requested to write file: {agent_response['file_path']}")
             file_path = agent_response["file_path"]
@@ -147,8 +169,20 @@ while True:
                 tool_result = {"tool_name": "write_file", "file_path": file_path, "stdout": "File written successfully"}
             except Exception as e:
                 tool_result = {"tool_name": "write_file", "file_path": file_path, "stderr": str(e), "exit_code": 1}
-            request_body["tool_response"] = tool_result
-            continue # Continue the loop to send the tool_response
+            
+            # Send tool response immediately
+            tool_response_body = {"conversation_id": conversation_id, "tool_response": tool_result}
+            logger.info(f"Sending tool response: {json.dumps(tool_response_body, indent=2)}")
+            try:
+                response = requests.post(f"{GEMINI_AGENT_API_URL}/v1/github/execute", json=tool_response_body)
+                response.raise_for_status()
+                agent_response = response.json()
+                logger.info(f"Received API Response after tool: {json.dumps(agent_response, indent=2)}")
+                conversation_id = agent_response["conversation_id"]
+                # Continue processing the new response
+            except requests.exceptions.RequestException as e:
+                logger.critical(f"Error sending tool response: {e}")
+                exit(1)
         else:
             logger.error(f"Unknown action: {action}")
             break
