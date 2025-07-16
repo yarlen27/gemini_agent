@@ -30,8 +30,8 @@ export class GitHubService {
             
             // Configure git user for the cloned repository
             const repoGit = simpleGit(repoPath);
-            await repoGit.addConfig('user.name', 'github-actions[bot]');
-            await repoGit.addConfig('user.email', 'github-actions[bot]@users.noreply.github.com');
+            await repoGit.addConfig('user.name', 'Cobalto Gemini');
+            await repoGit.addConfig('user.email', 'cobalto_gemini@27cobalto.com');
             
             return {
                 success: true,

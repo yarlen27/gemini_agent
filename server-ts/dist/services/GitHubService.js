@@ -26,8 +26,8 @@ class GitHubService {
             await git.clone(cloneUrl, repoPath);
             // Configure git user for the cloned repository
             const repoGit = (0, simple_git_1.default)(repoPath);
-            await repoGit.addConfig('user.name', 'github-actions[bot]');
-            await repoGit.addConfig('user.email', 'github-actions[bot]@users.noreply.github.com');
+            await repoGit.addConfig('user.name', 'Cobalto Gemini');
+            await repoGit.addConfig('user.email', 'cobalto_gemini@27cobalto.com');
             return {
                 success: true,
                 data: `Repository cloned successfully to ${repoPath}`
