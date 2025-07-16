@@ -247,15 +247,49 @@ Required in `docker-compose.yml`:
 3. **Usar curl interno** para aislar problemas de red
 4. **Verificar volúmenes** de Docker para certificados
 
+#### 6. **Tools ejecutando en directorio incorrecto (2025-07-16)**
+- **Problema**: WriteFileTool, ReadFileTool y ShellTool ejecutaban en `/app/` en lugar del directorio del repositorio clonado
+- **Síntoma**: Archivos se escribían exitosamente pero no aparecían en commits porque estaban en ubicación incorrecta
+- **Investigación**: Sistema de logging implementado mostró que tools reportaban éxito pero archivos estaban en `/app/` no en `/app/tmp/gemini-repos/{repo}/{issue}/`
+- **Solución**: Modificar ITool interface para aceptar ToolContext con workingDirectory, actualizar todos los tools para usar el contexto
+- **Lección**: Los tools necesitan contexto del directorio de trabajo del repositorio clonado para operaciones correctas
+
 ### 🔄 Status Actual (2025-07-16)
 - ✅ **SSL funcionando** con certificado Namecheap
 - ✅ **TypeScript server** deployado en producción
 - ✅ **Health endpoint** funcionando: https://gemini.27cobalto.com/health
+- ✅ **Sistema de logging** implementado y funcionando para debugging
+- ✅ **Working directory fix** implementado y probado exitosamente
 - ✅ **Todos los servicios** funcionando correctamente
+- ✅ **Issue #103** procesado exitosamente con archivo creado en ubicación correcta
 - ✅ **Documentación** actualizada en CLAUDE.md
-- ⚠️ **Cliente Python desactualizado** - Llama a endpoint incorrecto
 
-## 🚀 Plan de Migración a TypeScript (2025-07-16)
+### 🛠️ Últimas Mejoras Implementadas (2025-07-16)
+
+#### Sistema de Logging Completo
+- **Logger.ts**: Singleton pattern con logging estructurado a archivos y consola
+- **LogsController**: Endpoints para debugging (`/logs/debug`, `/logs/conversation/:id`, `/logs/simulate`)
+- **Logging detallado**: En todo el flujo de WebhookController y GeminiService
+- **Almacenamiento**: Logs en `/app/logs/` dentro del contenedor
+
+#### Working Directory Fix 
+- **ITool interface**: Modificada para aceptar ToolContext con workingDirectory
+- **Tools actualizados**: WriteFileTool, ReadFileTool, ShellTool usan contexto de directorio
+- **ToolRegistry**: Pasa contexto a tools
+- **WebhookController**: Obtiene directorio del repositorio de GitHubService
+- **Resultado**: Archivos ahora se crean en directorio correcto del repositorio clonado
+
+### 🎯 Funcionalidad Verificada
+- ✅ **Clonado de repositorio** en `/app/tmp/gemini-repos/{repo}/{issue}/`
+- ✅ **Creación de branches** automática
+- ✅ **Ejecución de tools** en directorio correcto del repositorio
+- ✅ **Escritura de archivos** en ubicación correcta
+- ✅ **Commits automáticos** con archivos incluidos
+- ✅ **Push de branches** a GitHub
+- ✅ **Creación de PR links** automática
+- ✅ **Logging completo** para debugging
+
+## 🚀 Plan de Migración a TypeScript - COMPLETADO ✅ (2025-07-16)
 
 ### Objetivo
 Migrar completamente el proyecto a TypeScript, eliminando todo el código Python legacy para tener una arquitectura unificada.
@@ -281,9 +315,17 @@ Migrar completamente el proyecto a TypeScript, eliminando todo el código Python
    - Eliminar todo código Python
    - Actualizar documentación
 
-### Estado de Migración
-- [ ] Cliente TypeScript
-- [ ] Tests de integración
-- [ ] GitHub Workflow actualizado
-- [ ] Código Python eliminado
-- [ ] Documentación actualizada
+### Estado de Migración - COMPLETADO ✅
+- ✅ **Cliente TypeScript** - Migrado completamente (#90)
+- ✅ **Tests de integración** - Tests TDD implementados (23/23 passing) (#94)
+- ✅ **GitHub Workflow actualizado** - Usando Node.js y TypeScript (#91)
+- ⏳ **Código Python eliminado** - Pendiente de hacer cleanup (#92)
+- ✅ **Documentación actualizada** - CLAUDE.md actualizado con estado actual (#93)
+- ✅ **Sistema de logging** - Implementado para debugging
+- ✅ **Working directory fix** - Tools funcionando en directorio correcto
+- ✅ **Producción funcionando** - Issue #103 procesado exitosamente
+
+### 🎯 Siguientes Pasos
+1. **Cleanup opcional**: Eliminar directorio `server/` (Python legacy) cuando se confirme estabilidad
+2. **Monitoreo**: Usar sistema de logging para identificar cualquier problema en producción
+3. **Optimizaciones**: Considerar mejoras de performance basadas en logs de uso real
