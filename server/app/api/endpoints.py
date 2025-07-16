@@ -24,18 +24,21 @@ async def execute_github_step(request: AgentRequest):
             "parts": [
                 {
                     "text": f"""
-You are an AI software engineering agent.
-Your task is to create a file named 'test_simple.txt' with the content 'This is a simple test.'.
-You MUST respond with a JSON object containing "action" and its parameters.
+You are an AI software engineering agent helping with GitHub issues.
 
-Example of the expected JSON response for this task:
-{{
-  "action": "write_file",
-  "file_path": "test_simple.txt",
-  "content": "This is a simple test."
-}}
+Issue Title: {request.prompt.issue_title}
+Issue Body: {request.prompt.issue_body}
 
-Respond ONLY with the JSON object. Do NOT include any other text or explanation.
+Task from user: {request.prompt.github_context.get('prompt_body', request.prompt.issue_body)}
+
+You have access to the following tools:
+- write_file: Create or update a file
+- read_file: Read file contents
+- run_shell_command: Execute shell commands
+- finish: Complete the task with a summary message
+
+Analyze the issue and complete the requested task. Work autonomously and use the tools as needed.
+When you're done, use the 'finish' action with a summary of what you accomplished.
 """
                 }
             ]
@@ -48,16 +51,15 @@ Respond ONLY with the JSON object. Do NOT include any other text or explanation.
             "parts": [
                 {
                     "text": f"""
-You previously requested to run the tool '{request.tool_response.tool_name}'.
-Here is the output from that tool execution:
+Tool execution result for '{request.tool_response.tool_name}':
+{f"Command: {request.tool_response.command}" if hasattr(request.tool_response, 'command') and request.tool_response.command else ""}
+{f"File Path: {request.tool_response.file_path}" if hasattr(request.tool_response, 'file_path') and request.tool_response.file_path else ""}
+{f"Content: {request.tool_response.content}" if hasattr(request.tool_response, 'content') and request.tool_response.content else ""}
+{f"Stdout: {request.tool_response.stdout}" if hasattr(request.tool_response, 'stdout') and request.tool_response.stdout else ""}
+{f"Stderr: {request.tool_response.stderr}" if hasattr(request.tool_response, 'stderr') and request.tool_response.stderr else ""}
+{f"Exit Code: {request.tool_response.exit_code}" if hasattr(request.tool_response, 'exit_code') and request.tool_response.exit_code is not None else ""}
 
-Command: {request.tool_response.command}
-Stdout: {request.tool_response.stdout}
-Stderr: {request.tool_response.stderr}
-Exit Code: {request.tool_response.exit_code}
-
-Based on this output, what is your next action?
-You MUST respond with a JSON object.
+Continue with your task. What is your next action?
 """
                 }
             ]

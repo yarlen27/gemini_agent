@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  api:
+    build: ./server
+    container_name: gemini-api
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - redis
+    networks:
+      - gemini-network
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: gemini-redis
+    volumes:
+      - redis-data:/data
+    networks:
+      - gemini-network
+    restart: unless-stopped
+
+  nginx-proxy:
+    image: nginxproxy/nginx-proxy
+    container_name: nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - certs:/etc/nginx/certs
+      - vhost:/etc/nginx/vhost.d
+      - html:/usr/share/nginx/html
+    networks:
+      - gemini-network
+    restart: unless-stopped
+
+  acme-companion:
+    image: nginxproxy/acme-companion
+    container_name: nginx-proxy-acme
+    volumes_from:
+      - nginx-proxy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - DEFAULT_EMAIL=yarlen@27cobalto.com
+    networks:
+      - gemini-network
+    restart: unless-stopped
+
+  api-proxy:
+    image: nginx:alpine
+    container_name: api-proxy
+    environment:
+      - VIRTUAL_HOST=gemini.27cobalto.com
+      - LETSENCRYPT_HOST=gemini.27cobalto.com
+      - VIRTUAL_PORT=80
+    volumes:
+      - ./nginx-api.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - api
+    networks:
+      - gemini-network
+    restart: unless-stopped
+
+networks:
+  gemini-network:
+    driver: bridge
+
+volumes:
+  redis-data:
+  certs:
+  vhost:
+  html:

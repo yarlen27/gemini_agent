@@ -9,6 +9,8 @@ class PromptContext(BaseModel):
 class ToolResponse(BaseModel):
     tool_name: str
     command: Optional[str] = None
+    file_path: Optional[str] = None
+    content: Optional[str] = None
     stdout: Optional[str] = None
     stderr: Optional[str] = None
     exit_code: Optional[int] = None
