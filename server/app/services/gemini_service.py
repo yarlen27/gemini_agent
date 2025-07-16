@@ -5,7 +5,7 @@ import json
 class GeminiService:
     def __init__(self):
         genai.configure(api_key=settings.GEMINI_API_KEY)
-        self.model = genai.GenerativeModel('gemini-1.5-pro') # Ensure we use a model that supports function calling
+        self.model = genai.GenerativeModel('gemini-2.5-flash') # Using gemini-2.5-flash as requested
 
         # Define the tools (Function Declarations)
         self.tools = [
