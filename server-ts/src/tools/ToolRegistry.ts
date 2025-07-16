@@ -1,4 +1,4 @@
-import { ITool } from './interfaces/ITool';
+import { ITool, ToolContext } from './interfaces/ITool';
 import { ToolResult } from '../models/ToolResult';
 
 export class ToolRegistry {
@@ -8,7 +8,7 @@ export class ToolRegistry {
         this.tools.set(tool.name, tool);
     }
 
-    public async execute(toolName: string, args: any): Promise<ToolResult> {
+    public async execute(toolName: string, args: any, context?: ToolContext): Promise<ToolResult> {
         const tool = this.tools.get(toolName);
         
         if (!tool) {
@@ -18,7 +18,7 @@ export class ToolRegistry {
             };
         }
 
-        return await tool.execute(args);
+        return await tool.execute(args, context);
     }
 
     public getAvailableTools(): string[] {

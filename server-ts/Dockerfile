@@ -28,8 +28,8 @@ COPY --from=builder /app/package*.json ./
 RUN addgroup -g 1001 -S nodejs
 RUN adduser -S gemini -u 1001
 
-# Create temp directory for git operations
-RUN mkdir -p /app/tmp
+# Create temp directory for git operations and logs
+RUN mkdir -p /app/tmp /app/logs
 
 # Change ownership
 RUN chown -R gemini:nodejs /app

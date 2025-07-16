@@ -1,11 +1,12 @@
-import { ITool } from '../interfaces/ITool';
+import { ITool, ToolContext } from '../interfaces/ITool';
 import { ToolResult } from '../../models/ToolResult';
 import { readFile } from 'fs/promises';
+import { join, resolve } from 'path';
 
 export class ReadFileTool implements ITool {
     public readonly name = 'read_file';
 
-    public async execute(args: { file_path: string }): Promise<ToolResult> {
+    public async execute(args: { file_path: string }, context?: ToolContext): Promise<ToolResult> {
         try {
             if (!args.file_path || args.file_path.trim() === '') {
                 return {
@@ -14,7 +15,19 @@ export class ReadFileTool implements ITool {
                 };
             }
 
-            const content = await readFile(args.file_path, 'utf-8');
+            // Resolve file path relative to working directory
+            let fullPath = args.file_path;
+            if (context?.workingDirectory) {
+                // If path is relative, join with working directory
+                if (!args.file_path.startsWith('/')) {
+                    fullPath = join(context.workingDirectory, args.file_path);
+                } else {
+                    // If path is absolute, still ensure it's within working directory for security
+                    fullPath = resolve(context.workingDirectory, '.' + args.file_path);
+                }
+            }
+
+            const content = await readFile(fullPath, 'utf-8');
             
             return {
                 success: true,

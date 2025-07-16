@@ -8,7 +8,7 @@ class ToolRegistry {
     register(tool) {
         this.tools.set(tool.name, tool);
     }
-    async execute(toolName, args) {
+    async execute(toolName, args, context) {
         const tool = this.tools.get(toolName);
         if (!tool) {
             return {
@@ -16,7 +16,7 @@ class ToolRegistry {
                 error: `Tool '${toolName}' not found. Available tools: ${Array.from(this.tools.keys()).join(', ')}`
             };
         }
-        return await tool.execute(args);
+        return await tool.execute(args, context);
     }
     getAvailableTools() {
         return Array.from(this.tools.keys());

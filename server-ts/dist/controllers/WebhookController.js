@@ -82,6 +82,9 @@ When you're done, use the 'finish' action with a summary of what you accomplishe
             await this.logger.info('WebhookController', 'Starting Gemini conversation', { historyLength: history.length }, conversationId, issue_number);
             let response = await this.geminiService.generateResponse(history, conversationId, issue_number);
             response.conversation_id = conversationId;
+            // Get working directory for tools
+            const workingDirectory = this.githubService.getRepositoryPath(repo, issue_number);
+            await this.logger.info('WebhookController', 'Tool working directory configured', { workingDirectory }, conversationId, issue_number);
             // Handle tool execution loop
             while (response.action !== 'finish') {
                 await this.logger.info('WebhookController', `Executing tool: ${response.action}`, {
@@ -93,7 +96,7 @@ When you're done, use the 'finish' action with a summary of what you accomplishe
                 if (response.action === 'run_shell_command') {
                     const toolResult = await this.toolRegistry.execute('run_shell_command', {
                         command: response.command
-                    });
+                    }, { workingDirectory });
                     // Log tool execution result
                     await this.logger.info('WebhookController', `Tool execution result: run_shell_command`, {
                         command: response.command,
@@ -123,7 +126,7 @@ Continue with your task. What is your next action?`
                 else if (response.action === 'read_file') {
                     const toolResult = await this.toolRegistry.execute('read_file', {
                         file_path: response.file_path
-                    });
+                    }, { workingDirectory });
                     // Log tool execution result
                     await this.logger.info('WebhookController', `Tool execution result: read_file`, {
                         file_path: response.file_path,
@@ -150,7 +153,7 @@ Continue with your task. What is your next action?`
                     const toolResult = await this.toolRegistry.execute('write_file', {
                         file_path: response.file_path,
                         content: response.content
-                    });
+                    }, { workingDirectory });
                     // Log tool execution result
                     await this.logger.info('WebhookController', `Tool execution result: write_file`, {
                         file_path: response.file_path,

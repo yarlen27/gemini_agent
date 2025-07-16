@@ -8,7 +8,7 @@ class ShellTool {
     constructor() {
         this.name = 'run_shell_command';
     }
-    async execute(args) {
+    async execute(args, context) {
         try {
             if (!args.command || args.command.trim() === '') {
                 return {
@@ -16,11 +16,16 @@ class ShellTool {
                     error: 'Command cannot be empty'
                 };
             }
-            const { stdout, stderr } = await execAsync(args.command);
+            // Set execution options with working directory if provided
+            const execOptions = {};
+            if (context?.workingDirectory) {
+                execOptions.cwd = context.workingDirectory;
+            }
+            const { stdout, stderr } = await execAsync(args.command, execOptions);
             return {
                 success: true,
-                stdout: stdout,
-                stderr: stderr,
+                stdout: stdout.toString(),
+                stderr: stderr.toString(),
                 exitCode: 0
             };
         }
