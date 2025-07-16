@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  api:
+    build: ./server
+    container_name: gemini-api-local
+    ports:
+      - "8001:8000"
+    environment:
+      - GEMINI_API_KEY=AIzaSyDVkgRk8wG9dU5k9h4AIfFkitAkrYTfFz8
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - redis
+    networks:
+      - gemini-network
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: gemini-redis-local
+    volumes:
+      - redis-data:/data
+    networks:
+      - gemini-network
+    restart: unless-stopped
+
+networks:
+  gemini-network:
+    driver: bridge
+
+volumes:
+  redis-data:

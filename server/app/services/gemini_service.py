@@ -4,6 +4,9 @@ import json
 
 class GeminiService:
     def __init__(self):
+        print(f"DEBUG: GEMINI_API_KEY = {settings.GEMINI_API_KEY[:10]}...")
+        if not settings.GEMINI_API_KEY:
+            raise ValueError("GEMINI_API_KEY is not set")
         genai.configure(api_key=settings.GEMINI_API_KEY)
         self.model = genai.GenerativeModel('gemini-2.5-flash') # Using gemini-2.5-flash as requested
 
