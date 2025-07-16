@@ -8,37 +8,39 @@ This is a **Gemini Agent for GitHub Automation** - an AI-powered agent that auto
 
 ## Architecture
 
-### Current (Python - Being Migrated)
-- **API Server**: FastAPI application (`server/app/main.py`) that orchestrates all agent operations
-- **State Management**: Redis for conversation history persistence
-- **AI Integration**: Google Gemini (gemini-2.5-flash) with function calling capabilities
-- **GitHub Integration**: Custom client script (`/.github/scripts/client.py`) that communicates with the API
-
-### New (TypeScript - In Development)
+### Current (TypeScript - PRODUCTION)
 - **API Server**: Express.js application (`server-ts/src/`) with clean .NET-style architecture
 - **Tools System**: Plugin-based architecture with ITool interface, zero if-else statements
 - **State Management**: Redis for conversation history persistence
 - **AI Integration**: Google Gemini with function calling capabilities
 - **GitHub Integration**: Webhook-based system (eliminates GitHub Actions overhead)
+- **Production URL**: https://gemini.27cobalto.com
+- **Health Check**: https://gemini.27cobalto.com/health
+
+### Legacy (Python - DEPRECATED)
+- **API Server**: FastAPI application (`server/app/main.py`) - NO LONGER USED
+- **State Management**: Redis for conversation history persistence
+- **AI Integration**: Google Gemini (gemini-2.5-flash) with function calling capabilities
+- **GitHub Integration**: Custom client script (`/.github/scripts/client.py`) that communicates with the API
 
 ## Development Commands
 
 ### Local Development
 ```bash
-# Start all services (API + Redis)
-cd server && docker compose up --build -d
+# Start all services (API + Redis) - TypeScript version
+cd server-ts && docker compose up --build -d
 
 # View logs
-cd server && docker compose logs -f
+cd server-ts && docker compose logs -f
 
 # Stop services
-cd server && docker compose down
+cd server-ts && docker compose down
 
 # Run tests
-cd server && npm test
+cd server-ts && npm test
 
 # Build TypeScript
-cd server && npm run build
+cd server-ts && npm run build
 ```
 
 ### Automated Production Deployment (Recommended)
@@ -68,7 +70,7 @@ cd server && npm run build
 
 4. **Get secrets and replace variables**
    ```bash
-   cd server
+   cd server-ts  # IMPORTANT: Use server-ts directory, not server
    GEMINI_KEY=$(gh secret get GEMINI_API_KEY)
    GITHUB_KEY=$(gh secret get PROD_GITHUB_TOKEN)
    sed -i "s/\${GEMINI_API_KEY}/GEMINI_API_KEY=$GEMINI_KEY/g" docker-compose.production.yml
@@ -99,9 +101,15 @@ cd server && npm run build
 ## Key Components
 
 ### API Endpoints
+- `GET /health` - Health check endpoint (returns status, timestamp, and available tools)
 - `POST /v1/github/execute` - Main endpoint for executing agent tasks (see `server/app/api/openapi.yml` for schema)
 
-### Services
+### Services (TypeScript)
+- **GeminiService** (`server-ts/src/services/GeminiService.ts`): Handles AI interactions with function calling for file operations
+- **GitHubService** (`server-ts/src/services/GitHubService.ts`): Manages GitHub API interactions
+- **WebhookController** (`server-ts/src/controllers/WebhookController.ts`): Handles GitHub webhook events
+
+### Services (Python - Legacy)
 - **GeminiService** (`server/app/services/gemini_service.py`): Handles AI interactions with function calling for file operations
 - **RedisService** (`server/app/services/redis_service.py`): Manages conversation state persistence
 
@@ -152,18 +160,20 @@ Required in `docker-compose.yml`:
 ## Important Notes
 
 - The API server runs on port 8001 (not 8000)
-- Redis runs on port 6380 (not default 6379)
+- Redis runs on port 6379 (default)
 - Conversation history is stored with key pattern: `conversation:{repo}:{issue_number}`
 - The agent can resume failed jobs from the last successful step
 - All file paths in function calls should be relative to the repository root
+- **IMPORTANT**: Production deployment uses `server-ts/` directory, not `server/`
 
 ## Production Server Info
 
-### 🚀 Ready for Deployment
+### 🚀 PRODUCTION DEPLOYED ✅
 - **Target domain**: gemini.27cobalto.com
 - **Production server**: `root@178.128.133.94`
-- **SSL**: Automatic via Let's Encrypt
-- **Deployment**: Follow Manual Production Deployment Steps above
+- **SSL**: ✅ Namecheap certificate installed (manual, not Let's Encrypt)
+- **Status**: ✅ ACTIVE - TypeScript server deployed
+- **Health check**: ✅ https://gemini.27cobalto.com/health
 - **Services**: API + Redis + Nginx proxy + SSL companion
 
 ### 🔧 Production Server Access
@@ -182,3 +192,64 @@ Required in `docker-compose.yml`:
 ### 📋 Deployment Scripts
 - **deploy_with_secrets.sh**: Automated deployment using GitHub Secrets
 - **Requirements**: `gh` CLI tool authenticated on local machine
+
+## Lecciones Aprendidas (2025-07-16)
+
+### 🚨 Problemas Críticos Encontrados y Soluciones
+
+#### 1. **Directorio Incorrecto de Deployment**
+- **Problema**: Se estaba deployando desde `server/` (Python) en lugar de `server-ts/` (TypeScript)
+- **Síntoma**: Endpoint `/health` devolvía 404 Not Found
+- **Solución**: Cambiar deployment a usar `server-ts/docker-compose.production.yml`
+- **Lección**: Siempre verificar que el directorio de deployment coincida con la tecnología actual
+
+#### 2. **Certificados SSL con Formato Incorrecto**
+- **Problema**: nginx no podía cargar certificados SSL (error: PEM routines::bad end line)
+- **Síntoma**: `nginx -t` fallaba con error SSL
+- **Solución**: Regenerar fullchain.pem con nueva línea entre certificados: `(cat cert.crt; echo; cat ca-bundle) > fullchain.pem`
+- **Lección**: Los certificados SSL deben tener formato correcto con líneas vacías entre certificados
+
+#### 3. **nginx.conf Montado como Directorio**
+- **Problema**: nginx.conf se creó como directorio vacío en lugar de archivo
+- **Síntoma**: api-proxy container fallaba al iniciar
+- **Solución**: Usar la ruta correcta `../server-ts/nginx.conf` en docker-compose
+- **Lección**: Verificar que los archivos de configuración existan y sean archivos, no directorios
+
+#### 4. **Clave Privada SSL Perdida**
+- **Problema**: La clave privada del certificado SSL no estaba en el repositorio
+- **Síntoma**: No se podía completar la instalación SSL
+- **Solución**: Recuperar la clave privada del CSR original en `/tmp/gemini.27cobalto.com.key`
+- **Lección**: Guardar claves privadas en ubicación segura durante el proceso de certificación
+
+#### 5. **Let's Encrypt Rate Limit**
+- **Problema**: "too many certificates (5) already issued for this exact set"
+- **Síntoma**: acme-companion no podía generar nuevos certificados
+- **Solución**: Usar certificado comercial de Namecheap
+- **Lección**: Tener plan B para SSL cuando Let's Encrypt falla
+
+### 🎯 Mejores Prácticas Establecidas
+
+#### SSL Certificate Management
+1. **Usar certificado comercial** para producción (Namecheap)
+2. **Guardar claves privadas** en ubicación segura
+3. **Verificar formato** de certificados antes de instalación
+4. **Probar nginx -t** antes de aplicar cambios
+
+#### Deployment Process
+1. **Verificar directorio correcto** (`server-ts/` no `server/`)
+2. **Probar endpoints** después de deployment
+3. **Verificar SSL** con curl externo
+4. **Documentar cambios** en CLAUDE.md
+
+#### Troubleshooting
+1. **Verificar logs** de todos los contenedores
+2. **Probar nginx -t** para validar configuración
+3. **Usar curl interno** para aislar problemas de red
+4. **Verificar volúmenes** de Docker para certificados
+
+### 🔄 Status Actual (2025-07-16)
+- ✅ **SSL funcionando** con certificado Namecheap
+- ✅ **TypeScript server** deployado en producción
+- ✅ **Health endpoint** funcionando: https://gemini.27cobalto.com/health
+- ✅ **Todos los servicios** funcionando correctamente
+- ✅ **Documentación** actualizada en CLAUDE.md
