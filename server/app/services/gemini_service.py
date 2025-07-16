@@ -10,53 +10,49 @@ class GeminiService:
         # Define the tools (Function Declarations)
         self.tools = [
             {
-                "functionDeclarations": [
-                    {
-                        "name": "write_file",
-                        "description": "Writes content to a file.",
-                        "parameters": {
-                            "type": "object",
-                            "properties": {
-                                "file_path": { "type": "string" },
-                                "content": { "type": "string" }
-                            },
-                            "required": ["file_path", "content"]
-                        }
+                "name": "write_file",
+                "description": "Writes content to a file.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "file_path": { "type": "string" },
+                        "content": { "type": "string" }
                     },
-                    {
-                        "name": "read_file",
-                        "description": "Reads the content of a file.",
-                        "parameters": {
-                            "type": "object",
-                            "properties": {
-                                "file_path": { "type": "string" }
-                            },
-                            "required": ["file_path"]
-                        }
+                    "required": ["file_path", "content"]
+                }
+            },
+            {
+                "name": "read_file",
+                "description": "Reads the content of a file.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "file_path": { "type": "string" }
                     },
-                    {
-                        "name": "run_shell_command",
-                        "description": "Executes a shell command.",
-                        "parameters": {
-                            "type": "object",
-                            "properties": {
-                                "command": { "type": "string" }
-                            },
-                            "required": ["command"]
-                        }
+                    "required": ["file_path"]
+                }
+            },
+            {
+                "name": "run_shell_command",
+                "description": "Executes a shell command.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "command": { "type": "string" }
                     },
-                    {
-                        "name": "finish",
-                        "description": "Indicates task completion.",
-                        "parameters": {
-                            "type": "object",
-                            "properties": {
-                                "message": { "type": "string" }
-                            },
-                            "required": ["message"]
-                        }
-                    }
-                ]
+                    "required": ["command"]
+                }
+            },
+            {
+                "name": "finish",
+                "description": "Indicates task completion.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "message": { "type": "string" }
+                    },
+                    "required": ["message"]
+                }
             }
         ]
 
