@@ -19,6 +19,7 @@ const RenameFileWithPatternTool_1 = require("./tools/implementations/categories/
 const DeleteFilesByExtensionTool_1 = require("./tools/implementations/categories/files/DeleteFilesByExtensionTool");
 const CreateDirectoryStructureTool_1 = require("./tools/implementations/categories/files/CreateDirectoryStructureTool");
 const SearchTextInFilesTool_1 = require("./tools/implementations/categories/files/SearchTextInFilesTool");
+const HttpApiTool_1 = require("./tools/implementations/categories/http/HttpApiTool");
 // Load environment variables
 (0, dotenv_1.config)();
 const app = (0, express_1.default)();
@@ -39,6 +40,11 @@ toolRegistry.register(new RenameFileWithPatternTool_1.RenameFileWithPatternTool(
 toolRegistry.register(new DeleteFilesByExtensionTool_1.DeleteFilesByExtensionTool());
 toolRegistry.register(new CreateDirectoryStructureTool_1.CreateDirectoryStructureTool());
 toolRegistry.register(new SearchTextInFilesTool_1.SearchTextInFilesTool());
+toolRegistry.register(new HttpApiTool_1.SendPostRequestTool());
+toolRegistry.register(new HttpApiTool_1.TestGetEndpointTool());
+toolRegistry.register(new HttpApiTool_1.UploadFileTool());
+toolRegistry.register(new HttpApiTool_1.DownloadFileTool());
+toolRegistry.register(new HttpApiTool_1.SendWebhookTool());
 // Initialize services
 const geminiService = new GeminiService_1.GeminiService(GEMINI_API_KEY, toolRegistry);
 const githubService = new GitHubService_1.GitHubService(GITHUB_TOKEN);
