@@ -14,6 +14,11 @@ const ToolRegistry_1 = require("./tools/ToolRegistry");
 const ShellTool_1 = require("./tools/implementations/ShellTool");
 const ReadFileTool_1 = require("./tools/implementations/ReadFileTool");
 const WriteFileTool_1 = require("./tools/implementations/WriteFileTool");
+const CopyFileToDirectoryTool_1 = require("./tools/implementations/categories/files/CopyFileToDirectoryTool");
+const RenameFileWithPatternTool_1 = require("./tools/implementations/categories/files/RenameFileWithPatternTool");
+const DeleteFilesByExtensionTool_1 = require("./tools/implementations/categories/files/DeleteFilesByExtensionTool");
+const CreateDirectoryStructureTool_1 = require("./tools/implementations/categories/files/CreateDirectoryStructureTool");
+const SearchTextInFilesTool_1 = require("./tools/implementations/categories/files/SearchTextInFilesTool");
 // Load environment variables
 (0, dotenv_1.config)();
 const app = (0, express_1.default)();
@@ -29,6 +34,11 @@ const toolRegistry = new ToolRegistry_1.ToolRegistry();
 toolRegistry.register(new ShellTool_1.ShellTool());
 toolRegistry.register(new ReadFileTool_1.ReadFileTool());
 toolRegistry.register(new WriteFileTool_1.WriteFileTool());
+toolRegistry.register(new CopyFileToDirectoryTool_1.CopyFileToDirectoryTool());
+toolRegistry.register(new RenameFileWithPatternTool_1.RenameFileWithPatternTool());
+toolRegistry.register(new DeleteFilesByExtensionTool_1.DeleteFilesByExtensionTool());
+toolRegistry.register(new CreateDirectoryStructureTool_1.CreateDirectoryStructureTool());
+toolRegistry.register(new SearchTextInFilesTool_1.SearchTextInFilesTool());
 // Initialize services
 const geminiService = new GeminiService_1.GeminiService(GEMINI_API_KEY, toolRegistry);
 const githubService = new GitHubService_1.GitHubService(GITHUB_TOKEN);
