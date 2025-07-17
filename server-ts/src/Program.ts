@@ -9,6 +9,11 @@ import { ToolRegistry } from './tools/ToolRegistry';
 import { ShellTool } from './tools/implementations/ShellTool';
 import { ReadFileTool } from './tools/implementations/ReadFileTool';
 import { WriteFileTool } from './tools/implementations/WriteFileTool';
+import { CopyFileToDirectoryTool } from './tools/implementations/categories/files/CopyFileToDirectoryTool';
+import { RenameFileWithPatternTool } from './tools/implementations/categories/files/RenameFileWithPatternTool';
+import { DeleteFilesByExtensionTool } from './tools/implementations/categories/files/DeleteFilesByExtensionTool';
+import { CreateDirectoryStructureTool } from './tools/implementations/categories/files/CreateDirectoryStructureTool';
+import { SearchTextInFilesTool } from './tools/implementations/categories/files/SearchTextInFilesTool';
 
 // Load environment variables
 config();
@@ -29,6 +34,11 @@ const toolRegistry = new ToolRegistry();
 toolRegistry.register(new ShellTool());
 toolRegistry.register(new ReadFileTool());
 toolRegistry.register(new WriteFileTool());
+toolRegistry.register(new CopyFileToDirectoryTool());
+toolRegistry.register(new RenameFileWithPatternTool());
+toolRegistry.register(new DeleteFilesByExtensionTool());
+toolRegistry.register(new CreateDirectoryStructureTool());
+toolRegistry.register(new SearchTextInFilesTool());
 
 // Initialize services
 const geminiService = new GeminiService(GEMINI_API_KEY, toolRegistry);
