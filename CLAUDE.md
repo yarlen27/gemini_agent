@@ -329,13 +329,13 @@ Migrar completamente el proyecto a TypeScript, eliminando todo el código Python
 - `extract_zip_to_directory` - Extraer archivos comprimidos
 
 ### 🔀 **Git y GitHub**
-- `create_branch_from_main` - Crear branch desde main
+- ✅ `create_branch_from_main` - Crear branch desde main (**IMPLEMENTADO** 2025-07-17)
+- ✅ `create_pull_request_with_template` - Crear PR con template (**IMPLEMENTADO** 2025-07-17)
+- ✅ `add_comment_to_issue` - Agregar comentarios a issues (**IMPLEMENTADO** 2025-07-17)
+- ✅ `get_diff_between_branches` - Obtener diferencias entre branches (**IMPLEMENTADO** 2025-07-17)
+- ✅ `cherry_pick_commit` - Cherry pick de commits específicos (**IMPLEMENTADO** 2025-07-17)
 - `merge_branch_with_squash` - Merge con squash
-- `create_pull_request_with_template` - Crear PR con template
-- `add_comment_to_issue` - Agregar comentarios a issues
 - `close_issue_with_message` - Cerrar issues con mensaje
-- `get_diff_between_branches` - Obtener diferencias entre branches
-- `cherry_pick_commit` - Cherry pick de commits específicos
 - `revert_specific_commit` - Revertir commits específicos
 - `tag_current_commit` - Crear tags en commits
 
@@ -415,6 +415,56 @@ Migrar completamente el proyecto a TypeScript, eliminando todo el código Python
 7. **PostgreSQL y SQL** - Operaciones de base de datos
 8. **Docker y DevOps** - Automatización de deployment
 9. **Documentación** - Generación automática
+
+## 🎯 Recientemente Implementado (2025-07-17)
+
+### ✅ Git y GitHub Advanced Tools - Issue #113
+Implementación completa de 5 herramientas avanzadas para Git y GitHub:
+
+#### 🔧 **Nuevas Herramientas Disponibles**
+1. **`create_branch_from_main`** - Crear branch desde main con configuración avanzada
+   - Parámetros: `branch_name`, `push_to_remote`, `checkout_after_create`
+   - Validación de nombre de branch y manejo de errores
+   - Sync automático con main antes de crear branch
+
+2. **`create_pull_request_with_template`** - Crear PR usando templates
+   - Parámetros: `title`, `body`, `base_branch`, `head_branch`, `template`, `draft`
+   - Integración con GitHub API y soporte para templates
+   - Detección automática de repositorio desde remote
+
+3. **`add_comment_to_issue`** - Agregar comentarios a issues con opciones
+   - Parámetros: `issue_number`, `comment_body`, `close_issue`
+   - Soporte para markdown y cierre automático de issues
+   - Validación de permisos y manejo de errores API
+
+4. **`get_diff_between_branches`** - Obtener diferencias entre branches
+   - Parámetros: `base_branch`, `compare_branch`, `file_filter`, `summary_only`
+   - Modo resumen y filtrado por archivos
+   - Estadísticas de cambios y formato detallado
+
+5. **`cherry_pick_commit`** - Cherry pick de commits específicos
+   - Parámetros: `commit_hash`, `target_branch`, `no_commit`
+   - Detección de conflictos y resolución guiada
+   - Validación de hash y manejo de commits inexistentes
+
+#### 🎯 **Características Técnicas**
+- ✅ **Implementación completa** siguiendo AGENT_GUIDELINES.md
+- ✅ **Validación robusta** de parámetros con mensajes de error claros
+- ✅ **Manejo de errores** con try/catch y fallbacks apropiados
+- ✅ **Integración GitHub API** con autenticación token
+- ✅ **Comandos Git seguros** con validaciones de estado
+- ✅ **Tests unitarios** para validación y casos edge
+- ✅ **Documentación completa** con ejemplos de uso
+- ✅ **Registro automático** en ToolRegistry
+
+#### 📊 **Estado de Implementación**
+- **Fecha**: 2025-07-17
+- **Issue**: #113
+- **Archivos creados**: 
+  - `server-ts/src/tools/implementations/categories/git/GitHubAdvancedTool.ts`
+  - `server-ts/src/tools/implementations/categories/git/types/GitHubAdvancedTypes.ts`
+  - `server-ts/tests/tools/categories/git/GitHubAdvancedTool.test.ts`
+- **Verificación**: ✅ Build exitoso, ✅ Tools registrados, ✅ Tests básicos pasando
 
 ## Memories
 

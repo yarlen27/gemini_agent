@@ -21,6 +21,13 @@ import {
     DownloadFileTool, 
     SendWebhookTool 
 } from './tools/implementations/categories/http/HttpApiTool';
+import {
+    CreateBranchFromMainTool,
+    CreatePullRequestWithTemplateTool,
+    AddCommentToIssueTool,
+    GetDiffBetweenBranchesTool,
+    CherryPickCommitTool
+} from './tools/implementations/categories/git/GitHubAdvancedTool';
 
 // Load environment variables
 config();
@@ -51,6 +58,11 @@ toolRegistry.register(new TestGetEndpointTool());
 toolRegistry.register(new UploadFileTool());
 toolRegistry.register(new DownloadFileTool());
 toolRegistry.register(new SendWebhookTool());
+toolRegistry.register(new CreateBranchFromMainTool());
+toolRegistry.register(new CreatePullRequestWithTemplateTool());
+toolRegistry.register(new AddCommentToIssueTool());
+toolRegistry.register(new GetDiffBetweenBranchesTool());
+toolRegistry.register(new CherryPickCommitTool());
 
 // Initialize services
 const geminiService = new GeminiService(GEMINI_API_KEY, toolRegistry);
