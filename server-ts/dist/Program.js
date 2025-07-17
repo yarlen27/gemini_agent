@@ -20,6 +20,7 @@ const DeleteFilesByExtensionTool_1 = require("./tools/implementations/categories
 const CreateDirectoryStructureTool_1 = require("./tools/implementations/categories/files/CreateDirectoryStructureTool");
 const SearchTextInFilesTool_1 = require("./tools/implementations/categories/files/SearchTextInFilesTool");
 const HttpApiTool_1 = require("./tools/implementations/categories/http/HttpApiTool");
+const GitHubAdvancedTool_1 = require("./tools/implementations/categories/git/GitHubAdvancedTool");
 // Load environment variables
 (0, dotenv_1.config)();
 const app = (0, express_1.default)();
@@ -45,6 +46,11 @@ toolRegistry.register(new HttpApiTool_1.TestGetEndpointTool());
 toolRegistry.register(new HttpApiTool_1.UploadFileTool());
 toolRegistry.register(new HttpApiTool_1.DownloadFileTool());
 toolRegistry.register(new HttpApiTool_1.SendWebhookTool());
+toolRegistry.register(new GitHubAdvancedTool_1.CreateBranchFromMainTool());
+toolRegistry.register(new GitHubAdvancedTool_1.CreatePullRequestWithTemplateTool());
+toolRegistry.register(new GitHubAdvancedTool_1.AddCommentToIssueTool());
+toolRegistry.register(new GitHubAdvancedTool_1.GetDiffBetweenBranchesTool());
+toolRegistry.register(new GitHubAdvancedTool_1.CherryPickCommitTool());
 // Initialize services
 const geminiService = new GeminiService_1.GeminiService(GEMINI_API_KEY, toolRegistry);
 const githubService = new GitHubService_1.GitHubService(GITHUB_TOKEN);
