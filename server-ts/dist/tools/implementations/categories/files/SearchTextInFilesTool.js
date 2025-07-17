@@ -52,9 +52,9 @@ class SearchTextInFilesTool {
             return {
                 success: true,
                 data: {
-                    results: results.slice(0, max_results),
+                    results: results,
                     total_matches: results.length,
-                    truncated: results.length > max_results,
+                    truncated: results.length >= max_results,
                     search_pattern: search_pattern,
                     directory: dirPath
                 }

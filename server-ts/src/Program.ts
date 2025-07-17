@@ -14,6 +14,13 @@ import { RenameFileWithPatternTool } from './tools/implementations/categories/fi
 import { DeleteFilesByExtensionTool } from './tools/implementations/categories/files/DeleteFilesByExtensionTool';
 import { CreateDirectoryStructureTool } from './tools/implementations/categories/files/CreateDirectoryStructureTool';
 import { SearchTextInFilesTool } from './tools/implementations/categories/files/SearchTextInFilesTool';
+import { 
+    SendPostRequestTool, 
+    TestGetEndpointTool, 
+    UploadFileTool, 
+    DownloadFileTool, 
+    SendWebhookTool 
+} from './tools/implementations/categories/http/HttpApiTool';
 
 // Load environment variables
 config();
@@ -39,6 +46,11 @@ toolRegistry.register(new RenameFileWithPatternTool());
 toolRegistry.register(new DeleteFilesByExtensionTool());
 toolRegistry.register(new CreateDirectoryStructureTool());
 toolRegistry.register(new SearchTextInFilesTool());
+toolRegistry.register(new SendPostRequestTool());
+toolRegistry.register(new TestGetEndpointTool());
+toolRegistry.register(new UploadFileTool());
+toolRegistry.register(new DownloadFileTool());
+toolRegistry.register(new SendWebhookTool());
 
 // Initialize services
 const geminiService = new GeminiService(GEMINI_API_KEY, toolRegistry);
