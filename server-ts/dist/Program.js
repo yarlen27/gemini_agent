@@ -21,6 +21,7 @@ const CreateDirectoryStructureTool_1 = require("./tools/implementations/categori
 const SearchTextInFilesTool_1 = require("./tools/implementations/categories/files/SearchTextInFilesTool");
 const HttpApiTool_1 = require("./tools/implementations/categories/http/HttpApiTool");
 const GitHubAdvancedTool_1 = require("./tools/implementations/categories/git/GitHubAdvancedTool");
+const ConfigurationTool_1 = require("./tools/implementations/categories/config/ConfigurationTool");
 // Load environment variables
 (0, dotenv_1.config)();
 const app = (0, express_1.default)();
@@ -51,6 +52,11 @@ toolRegistry.register(new GitHubAdvancedTool_1.CreatePullRequestWithTemplateTool
 toolRegistry.register(new GitHubAdvancedTool_1.AddCommentToIssueTool());
 toolRegistry.register(new GitHubAdvancedTool_1.GetDiffBetweenBranchesTool());
 toolRegistry.register(new GitHubAdvancedTool_1.CherryPickCommitTool());
+toolRegistry.register(new ConfigurationTool_1.SetEnvironmentVariableInDotenvTool());
+toolRegistry.register(new ConfigurationTool_1.ReadConfigValueFromJsonTool());
+toolRegistry.register(new ConfigurationTool_1.EncryptSecretWithKeyTool());
+toolRegistry.register(new ConfigurationTool_1.ValidateRequiredEnvVariablesTool());
+toolRegistry.register(new ConfigurationTool_1.MergeConfigFilesTool());
 // Initialize services
 const geminiService = new GeminiService_1.GeminiService(GEMINI_API_KEY, toolRegistry);
 const githubService = new GitHubService_1.GitHubService(GITHUB_TOKEN);

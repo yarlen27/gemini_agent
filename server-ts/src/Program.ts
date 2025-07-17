@@ -28,6 +28,13 @@ import {
     GetDiffBetweenBranchesTool,
     CherryPickCommitTool
 } from './tools/implementations/categories/git/GitHubAdvancedTool';
+import {
+    SetEnvironmentVariableInDotenvTool,
+    ReadConfigValueFromJsonTool,
+    EncryptSecretWithKeyTool,
+    ValidateRequiredEnvVariablesTool,
+    MergeConfigFilesTool
+} from './tools/implementations/categories/config/ConfigurationTool';
 
 // Load environment variables
 config();
@@ -63,6 +70,11 @@ toolRegistry.register(new CreatePullRequestWithTemplateTool());
 toolRegistry.register(new AddCommentToIssueTool());
 toolRegistry.register(new GetDiffBetweenBranchesTool());
 toolRegistry.register(new CherryPickCommitTool());
+toolRegistry.register(new SetEnvironmentVariableInDotenvTool());
+toolRegistry.register(new ReadConfigValueFromJsonTool());
+toolRegistry.register(new EncryptSecretWithKeyTool());
+toolRegistry.register(new ValidateRequiredEnvVariablesTool());
+toolRegistry.register(new MergeConfigFilesTool());
 
 // Initialize services
 const geminiService = new GeminiService(GEMINI_API_KEY, toolRegistry);
