@@ -35,6 +35,7 @@ import {
     ValidateRequiredEnvVariablesTool,
     MergeConfigFilesTool
 } from './tools/implementations/categories/config/ConfigurationTool';
+import { PlanningTool } from './tools/implementations/PlanningTool';
 
 // Load environment variables
 config();
@@ -75,6 +76,7 @@ toolRegistry.register(new ReadConfigValueFromJsonTool());
 toolRegistry.register(new EncryptSecretWithKeyTool());
 toolRegistry.register(new ValidateRequiredEnvVariablesTool());
 toolRegistry.register(new MergeConfigFilesTool());
+toolRegistry.register(new PlanningTool());
 
 // Initialize services
 const geminiService = new GeminiService(GEMINI_API_KEY, toolRegistry);

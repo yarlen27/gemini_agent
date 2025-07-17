@@ -5,12 +5,15 @@ import { ToolRegistry } from '../tools/ToolRegistry';
 import { GeminiRequest } from '../models/GeminiRequest';
 import { Logger } from '../utils/Logger';
 import { v4 as uuidv4 } from 'uuid';
+import { PlanService } from '../services/PlanService';
+import { TaskPlan } from '../models/TaskPlan';
 
 export class WebhookController {
     private geminiService: GeminiService;
     private githubService: GitHubService;
     private toolRegistry: ToolRegistry;
     private logger: Logger;
+    private planService: PlanService;
 
     constructor(
         geminiService: GeminiService,
@@ -21,6 +24,7 @@ export class WebhookController {
         this.githubService = githubService;
         this.toolRegistry = toolRegistry;
         this.logger = Logger.getInstance();
+        this.planService = PlanService.getInstance();
     }
 
     public async handleWebhook(req: Request, res: Response): Promise<void> {
@@ -136,6 +140,29 @@ When you're done, use the 'finish' action with a summary of what you accomplishe
                 }
             ];
 
+            // Check if this is a complex task that would benefit from planning
+            let currentPlan: TaskPlan | null = null;
+            if (this.isComplexTask(issue_body)) {
+                await this.logger.info(
+                    'WebhookController',
+                    'Complex task detected, creating initial plan',
+                    { issue_title, issue_body },
+                    conversationId,
+                    issue_number
+                );
+
+                // Create initial plan for complex tasks
+                currentPlan = await this.createInitialPlan(issue_title, issue_body, issue_number, repo);
+                
+                if (currentPlan) {
+                    // Update comment with initial plan
+                    if (comment_id) {
+                        const planMarkdown = this.planService.generateMarkdown(currentPlan);
+                        await this.githubService.updateComment(repo, comment_id, planMarkdown);
+                    }
+                }
+            }
+
             // Process with Gemini
             await this.logger.info(
                 'WebhookController',
@@ -195,6 +222,22 @@ When you're done, use the 'finish' action with a summary of what you accomplishe
                         issue_number
                     );
                     
+                    // Update plan progress if we have a plan
+                    if (currentPlan) {
+                        await this.updatePlanProgress(currentPlan, response.action, toolResult.success, 
+                            `Comando: ${response.command} - ${toolResult.success ? 'Exitoso' : 'Falló'}`);
+                        
+                        // Update GitHub comment with plan progress
+                        if (comment_id) {
+                            const updatedPlan = await this.planService.getPlan(currentPlan.id);
+                            if (updatedPlan) {
+                                currentPlan = updatedPlan;
+                                const planMarkdown = this.planService.generateMarkdown(currentPlan);
+                                await this.githubService.updateComment(repo, comment_id, planMarkdown);
+                            }
+                        }
+                    }
+                    
                     history.push({
                         role: 'user',
                         parts: [
@@ -230,6 +273,22 @@ Continue with your task. What is your next action?`
                         issue_number
                     );
                     
+                    // Update plan progress if we have a plan
+                    if (currentPlan) {
+                        await this.updatePlanProgress(currentPlan, response.action, toolResult.success, 
+                            `Archivo leído: ${response.file_path}`);
+                        
+                        // Update GitHub comment with plan progress
+                        if (comment_id) {
+                            const updatedPlan = await this.planService.getPlan(currentPlan.id);
+                            if (updatedPlan) {
+                                currentPlan = updatedPlan;
+                                const planMarkdown = this.planService.generateMarkdown(currentPlan);
+                                await this.githubService.updateComment(repo, comment_id, planMarkdown);
+                            }
+                        }
+                    }
+                    
                     history.push({
                         role: 'user',
                         parts: [
@@ -264,6 +323,22 @@ Continue with your task. What is your next action?`
                         conversationId,
                         issue_number
                     );
+                    
+                    // Update plan progress if we have a plan
+                    if (currentPlan) {
+                        await this.updatePlanProgress(currentPlan, response.action, toolResult.success, 
+                            `Archivo escrito: ${response.file_path}`);
+                        
+                        // Update GitHub comment with plan progress
+                        if (comment_id) {
+                            const updatedPlan = await this.planService.getPlan(currentPlan.id);
+                            if (updatedPlan) {
+                                currentPlan = updatedPlan;
+                                const planMarkdown = this.planService.generateMarkdown(currentPlan);
+                                await this.githubService.updateComment(repo, comment_id, planMarkdown);
+                            }
+                        }
+                    }
                     
                     history.push({
                         role: 'user',
@@ -380,7 +455,21 @@ Continue with your task. What is your next action?`
 
             // Update comment with final result
             if (comment_id) {
-                const commentBody = `Gemini TypeScript finished — [Create PR →](${prResult.data})\\n\\n✅ **Completed**: ${response.message}`;
+                let commentBody = `Gemini TypeScript finished — [Create PR →](${prResult.data})\\n\\n✅ **Completed**: ${response.message}`;
+                
+                // If we have a plan, update it to completed and include final results
+                if (currentPlan) {
+                    await this.planService.updatePlanStatus({
+                        planId: currentPlan.id,
+                        status: 'completed'
+                    });
+                    
+                    const finalPlan = await this.planService.getPlan(currentPlan.id);
+                    if (finalPlan) {
+                        const finalMarkdown = this.planService.generateMarkdown(finalPlan);
+                        commentBody = `${finalMarkdown}\\n\\n---\\n\\n**🚀 Implementación Completada**\\n\\n[Create PR →](${prResult.data})\\n\\n✅ **Resultado final**: ${response.message}`;
+                    }
+                }
                 
                 await this.logger.info(
                     'WebhookController',
@@ -425,5 +514,149 @@ Continue with your task. What is your next action?`
                 error: error.message
             });
         }
+    }
+
+    private isComplexTask(issueBody: string): boolean {
+        // Check for indicators of complex tasks
+        const complexityIndicators = [
+            'implement', 'create', 'add', 'build', 'develop', 'feature',
+            'refactor', 'migration', 'integration', 'system', 'architecture',
+            'multiple', 'several', 'various', 'different', 'components',
+            'tests', 'testing', 'documentation', 'docs', 'api', 'endpoint',
+            'database', 'model', 'service', 'controller', 'interface',
+            'planning', 'plan', 'steps', 'phases', 'requirements'
+        ];
+
+        const lowerBody = issueBody.toLowerCase();
+        const indicatorCount = complexityIndicators.filter(indicator => 
+            lowerBody.includes(indicator)
+        ).length;
+
+        // Consider complex if multiple indicators or long description
+        return indicatorCount >= 3 || issueBody.length > 500 || lowerBody.includes('feature:');
+    }
+
+    private async createInitialPlan(title: string, body: string, issueNumber: number, repo: string): Promise<TaskPlan | null> {
+        try {
+            // Create a basic plan structure based on common development patterns
+            const sections = [
+                {
+                    name: 'Análisis y Preparación',
+                    tasks: [
+                        { description: 'Analizar requerimientos del issue', details: undefined },
+                        { description: 'Revisar código existente relacionado', details: undefined },
+                        { description: 'Identificar archivos a modificar', details: undefined }
+                    ]
+                },
+                {
+                    name: 'Implementación',
+                    tasks: [
+                        { description: 'Implementar funcionalidad principal', details: undefined },
+                        { description: 'Crear/actualizar archivos necesarios', details: undefined },
+                        { description: 'Integrar con sistemas existentes', details: undefined }
+                    ]
+                },
+                {
+                    name: 'Validación y Finalización',
+                    tasks: [
+                        { description: 'Ejecutar pruebas si existen', details: undefined },
+                        { description: 'Verificar funcionamiento', details: undefined },
+                        { description: 'Crear commit y push', details: undefined }
+                    ]
+                }
+            ];
+
+            // Customize based on issue content
+            if (body.toLowerCase().includes('test')) {
+                sections[1].tasks.push({
+                    description: 'Crear tests unitarios',
+                    details: undefined
+                });
+            }
+
+            if (body.toLowerCase().includes('documentation') || body.toLowerCase().includes('docs')) {
+                sections[2].tasks.push({
+                    description: 'Actualizar documentación',
+                    details: undefined
+                });
+            }
+
+            const plan = await this.planService.createPlan({
+                title: `Plan: ${title}`,
+                sections,
+                issueNumber,
+                repository: repo
+            });
+
+            return plan;
+        } catch (error) {
+            await this.logger.error(
+                'WebhookController',
+                'Failed to create initial plan',
+                { error: error instanceof Error ? error.message : String(error) },
+                undefined,
+                issueNumber?.toString()
+            );
+            return null;
+        }
+    }
+
+    private async updatePlanProgress(plan: TaskPlan, action: string, success: boolean, details?: string): Promise<void> {
+        if (!plan) return;
+
+        try {
+            // Find the most appropriate task to update based on the action
+            let taskToUpdate: { sectionIndex: number; taskIndex: number; taskId: string } | null = null;
+
+            for (let sectionIndex = 0; sectionIndex < plan.sections.length; sectionIndex++) {
+                const section = plan.sections[sectionIndex];
+                for (let taskIndex = 0; taskIndex < section.tasks.length; taskIndex++) {
+                    const task = section.tasks[taskIndex];
+                    if (!task.completed && this.doesActionMatchTask(action, task.description)) {
+                        taskToUpdate = { sectionIndex, taskIndex, taskId: task.id };
+                        break;
+                    }
+                }
+                if (taskToUpdate) break;
+            }
+
+            if (taskToUpdate && success) {
+                await this.planService.updateTaskStatus({
+                    planId: plan.id,
+                    taskId: taskToUpdate.taskId,
+                    completed: true,
+                    details: details || `Completado: ${action}`
+                });
+
+                await this.logger.info(
+                    'WebhookController',
+                    'Updated plan progress',
+                    { planId: plan.id, taskId: taskToUpdate.taskId, action },
+                    undefined,
+                    plan.issueNumber?.toString()
+                );
+            }
+        } catch (error) {
+            await this.logger.error(
+                'WebhookController',
+                'Failed to update plan progress',
+                { error: error instanceof Error ? error.message : String(error), planId: plan.id, action },
+                undefined,
+                plan.issueNumber?.toString()
+            );
+        }
+    }
+
+    private doesActionMatchTask(action: string, taskDescription: string): boolean {
+        const actionMappings = {
+            'read_file': ['analizar', 'revisar', 'identificar'],
+            'write_file': ['implementar', 'crear', 'actualizar'],
+            'run_shell_command': ['ejecutar', 'verificar', 'commit', 'push', 'pruebas']
+        };
+
+        const mappings = actionMappings[action as keyof typeof actionMappings] || [];
+        const lowerTask = taskDescription.toLowerCase();
+        
+        return mappings.some(mapping => lowerTask.includes(mapping));
     }
 }
